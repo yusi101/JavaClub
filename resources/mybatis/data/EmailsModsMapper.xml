@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="EmailsModsMapper">
+	<!-- 判断邮件模板是否存在-->
+	<select id="queryEmailsModsIDflag" parameterType="pd" resultType="pd">
+		select * from zr_email_mode  where EMAIL_TITLE=#{modsname}
+	</select>
+	<!-- 新增邮件模板 -->
+	<insert id="insertEmailsMods" parameterType="pd">
+		insert into zr_email_mode (ID,EMAIL_TITLE,EMAIL_CTX,USER_ID,ACTIVE)
+			values (#{uuId},#{modsname},#{remark},#{uId},#{status})
+	</insert>
+		<!-- 新增邮件模板 附件 -->
+	<insert id="insertEmailsModsAttr" parameterType="pd">
+		insert into zr_email_mode_attr (ID,EMAIL_MODE_ID,FILENAME,FILEURL)
+			values (#{modsId},#{uuId},#{mods},#{PATH})
+	</insert>
+	<!-- 查询邮件模板 -->
+	<select id="queryEmailsModslistPage" parameterType="page" resultType="pd">
+		select * from zr_email_mode s where 1=1
+		<if test="pd.ID != null and pd.ID != '' ">
+			and ID = #{pd.ID}
+		</if>
+		<if test="pd.STATUS != null and pd.STATUS != '' ">
+			and ACTIVE = #{pd.STATUS}
+		</if>
+		order by s.CURRENT_TIMESTAMP desc
+	</select>
+	
+	<!-- 查询激活的邮箱模板 -->
+	<select id="queryEmailActive" parameterType="pd" resultType="pd">
+		select em.ID,em.EMAIL_TITLE,em.EMAIL_CTX,em.ACTIVE,ema.FILENAME,ema.FILEURL from zr_email_mode em 
+			left join zr_email_mode_attr ema on em.ID = ema.EMAIL_MODE_ID
+			where em.ACTIVE = 1;
+	</select>
+	
+	<!-- 查询邮件模板  不分页-->
+	<select id="queryEmailsMods" parameterType="pd" resultType="pd">
+		select * from zr_email_mode s where 1=1
+		<if test="ID != null and ID != '' ">
+			and ID = #{ID}
+		</if>
+		<if test="STATUS != null and STATUS != '' ">
+			and ACTIVE = #{STATUS}
+		</if>
+		order by s.CURRENT_TIMESTAMP desc
+	</select>
+	<!-- 根据ID查询邮件模板 -->
+	<select id="queryEmailsModsID" parameterType="pd" resultType="pd">
+		select * from zr_email_mode where ID=#{KID}
+	</select>
+	<!-- 根据ID查询邮件模板 的所有附件-->
+	<select id="queryEmailsModsByIdAttrInfo" parameterType="pd" resultType="pd">
+		select * from zr_email_mode_attr where EMAIL_MODE_ID=#{KID}
+	</select>
+	
+		<!-- 删除邮件模板 -->
+	<delete id="delemailsMods" parameterType="pd">
+		<!-- DELETE FROM sys_keyword WHERE ID = #{ID}  -->
+		DELETE FROM zr_email_mode WHERE ID = #{ID} 
+	</delete>
+		<!-- 删除邮件模板附件 -->
+	<delete id="delemailsModsAttr" parameterType="pd">
+		<!-- DELETE FROM sys_keyword WHERE ID = #{ID}  -->
+		DELETE FROM zr_email_mode_attr WHERE EMAIL_MODE_ID = #{ID} 
+	</delete>
+		<!-- 删除单条邮件模板附件 -->
+	<delete id="delemailsModsIDAttr" parameterType="pd">
+		<!-- DELETE FROM sys_keyword WHERE ID = #{ID}  -->
+		DELETE FROM zr_email_mode_attr WHERE ID = #{EId} 
+	</delete>
+	 <!-- 修改邮件模板  -->
+	<update id="updateemailsModsById" parameterType="pd">
+		UPDATE zr_email_mode SET EMAIL_TITLE =#{modsname},EMAIL_CTX =#{remark},
+		USER_ID =#{uId},ACTIVE =#{status} where ID=#{ID}
+	</update>
+	
+	<update id="updateemailsModsstatus" parameterType="pd">
+			UPDATE zr_email_mode SET ACTIVE ='0' where ID != #{uuId}
+	</update>
+
+</mapper>

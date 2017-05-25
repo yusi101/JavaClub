@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LogMapper">
+
+	<!-- 插入日志 -->
+	<insert id="InsertLog">
+		insert into ZR_USER_LOG_INFO(ID,ACCOUNT,IP,LOGTYPE,LOGINFO,CREATEDTIME,REMARK) 
+		values(#{ID},#{ACCOUNT},#{IP},#{LOGTYPE},#{LOGINFO},#{CREATEDTIME},#{REMARK})
+	</insert>
+   <!-- 插入数据库日志 -->
+   <insert id="InsertDBINFO">
+		INSERT INTO SYS_LOG_DBINFO(ID,IP,LOGTYPE,SQLINFO,PARAMETERINFO,CREATEUSERID,CREATETIME,REMARK) 
+		VALUES(#{ID},#{IP},#{LOGTYPE},#{SQLINFO},#{PARAMETERINFO},#{CREATEUSERID},now(),#{REMARK})
+	</insert>
+	
+	<!-- 查询用户操作日志 -->
+	<select id="userLoglistPage" parameterType="page" resultType="pd">
+	SELECT
+	ID,
+	MODULENAME,
+	IP,
+	LOGTYPE,
+	CREATEDTIME,
+	CREATEUSERID,
+	(select NAME from sys_user u where  u.USER_ID = s.CREATEUSERID  ) as CREATEUSERNAME
+	FROM SYS_LOG_USERINFO s
+	WHERE 1=1
+	<if test=" pd.start_time != null and pd.start_time != '' and  pd.end_time != null and pd.end_time != '' ">
+		AND CREATEDTIME  &gt;= #{pd.start_time} AND CREATEDTIME &lt;= #{pd.end_time}
+	</if>
+	ORDER BY CREATEDTIME DESC
+	</select>
+	
+	<!-- 查看用户操作日志详情 -->
+	<select id="queryUserLogById" parameterType="pd" resultType="pd">
+	SELECT
+	ID,
+	MODULENAME,
+	IP,
+	LOGTYPE,
+	MODULEURL,
+	CREATEDTIME,
+	REMARK,
+	CREATEUSERID,
+	(select NAME from sys_user u where  u.USER_ID = s.CREATEUSERID  ) as CREATEUSERNAME
+	FROM SYS_LOG_USERINFO s
+	WHERE s.ID = #{ID}
+	</select>
+	
+	
+	<!-- 查询数据库操作日志 -->
+	<select id="queryDatabaseLoglistPage" parameterType="page" resultType="pd">
+	SELECT
+	ID,
+	IP,
+	LOGTYPE,
+	CREATETIME,
+	CREATEUSERID,
+	(select NAME from sys_user u where  u.USER_ID = s.CREATEUSERID  ) as CREATEUSERNAME
+	FROM SYS_LOG_DBINFO s
+	WHERE 1=1
+	<if test=" pd.start_time != null and pd.start_time != '' and  pd.end_time != null and pd.end_time != '' ">
+		AND CREATETIME  &gt;= #{pd.start_time} AND CREATETIME &lt;= #{pd.end_time}
+	</if>
+	ORDER BY CREATETIME DESC
+	</select>
+	
+	<!-- 查看数据库操作日志详情 -->
+	<select id="queryDatabaseLogById" parameterType="pd" resultType="pd">
+	SELECT
+	IP,
+	LOGTYPE,
+	SQLINFO,
+	CREATETIME,
+	PARAMETERINFO
+	REMARK,
+	CREATEUSERID,
+	(select NAME from sys_user u where  u.USER_ID = s.CREATEUSERID  ) as CREATEUSERNAME
+	FROM SYS_LOG_DBINFO s
+	WHERE ID = #{ID}
+	</select>
+</mapper>

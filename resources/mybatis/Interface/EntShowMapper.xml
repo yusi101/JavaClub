@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="EntShowMapper">
+	
+	<!-- 查询企业展示 -->
+	<select id="queryEntShowInfo" resultType="pd" useCache="false" parameterType="pd">
+		select ID,TITLE,TITLEIMG,CREATE_TIME,ENTNAME
+		<if test="id != null and id != '' ">
+		    	,CONTENT
+		</if>
+		FROM BL_SELFUPDATE 
+			WHERE STATUS = '1'
+			<if test="pripid != null and pripid != '' ">
+		    	AND PRIPID = #{pripid}
+			</if>
+			<if test="id != null and id != '' ">
+		    	AND ID = #{id} 
+			</if>
+			 ORDER BY CREATE_TIME DESC;
+	</select>
+	
+</mapper>

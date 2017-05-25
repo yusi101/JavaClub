@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MessageMapper">
+	
+	<!--根据用户ID查询个人未读消息记录-->
+	
+	<select id="queryMessageCount" parameterType="pd" resultType="Integer" useCache="false" >	
+		SELECT COUNT(1) FROM BL_MESSAGE WHERE STATUS = 0 AND MEMBER_ID=#{memberId} 
+	</select>
+
+	<!--根据用户ID查询个人消息-->
+		
+	<select id="queryMessageInfolistPage" parameterType="page" resultType="pd" useCache="false" >	
+		SELECT ID,TITLE,CONTENT,date_format(CREATETIME,'%Y.%m.%d') CREATETIME,STATUS,
+			(SELECT COUNT(ID) FROM BL_MESSAGE WHERE STATUS = 0) MSGNUM
+		 	FROM BL_MESSAGE 
+		 	WHERE 1=1
+		 	<if test="pd.memberId != null and pd.memberId != ''">
+				AND MEMBER_ID = #{pd.memberId}
+	  		</if>
+		 	 ORDER BY STATUS DESC 
+	</select>
+	<select id="queryMessageInfo" parameterType="pd" resultType="pd" useCache="false" >	
+		SELECT ID,TITLE,CONTENT,date_format(CREATETIME,'%Y.%m.%d') CREATETIME,STATUS,
+			(SELECT COUNT(ID) FROM BL_MESSAGE WHERE STATUS = 0) MSGNUM
+		 	FROM BL_MESSAGE 
+		 	WHERE 1=1
+		 	<if test="memberId != null and memberId != ''">
+				AND MEMBER_ID = #{memberId}
+	  		</if>
+		 	 ORDER BY STATUS DESC 
+	</select>	
+		
+		
+		
+	<!-- 根据ID查询个人消息-->	
+		<select id="queryMessageById" parameterType="pd" resultType="pd" useCache="false" >	
+			SELECT TITLE,CONTENT,date_format(CREATETIME,'%Y.%m.%d') CREATETIME FROM BL_MESSAGE WHERE ID=#{ID} 
+		</select>
+		
+	<!-- 根据ID更改状态 -->
+	
+		<update id="updateMessageById" parameterType="pd">
+	         UPDATE BL_MESSAGE SET STATUS = 1 WHERE ID=#{ID}
+		</update>
+		
+	<!-- 根据ID删除个人消息 -->
+	
+		<delete id="deleteMessageById" parameterType="pd">
+	         DELETE FROM BL_MESSAGE WHERE ID=#{ID} 
+		</delete>
+		
+	<!-- 添加用户消息记录 -->
+		<insert id="insertMessageData" parameterType="pd">
+			insert into bl_message(ID,MEMBER_ID,TITLE,CONTENT,CREATEUSER_ID,CREATETIME)
+				values (#{mid},#{memberId},#{mtitle},#{mcontent},#{uid},NOW())
+		</insert>
+</mapper>

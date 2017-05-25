@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ClaimMapper">
+	
+	<!-- 查询全部的认领审核 -->
+	<select id="queryClaimApplylistPage" parameterType="page" resultType="pd">
+		select c.*,e.ENTNAME,m.USERNAME,m.ALIASNAME from bl_claim c 
+			left join bl_enteradditioninfo e on c.PRIPID = e.PRIPID
+			left join bl_member m on c.MEMBER_ID = m.ID
+			where 1 = 1
+		<if test="pd.entname != null and pd.entname != ''">
+			and e.ENTNAME LIKE CONCAT(CONCAT('%', #{pd.entname}),'%') 
+		</if>		
+		<if test="pd.status != null and pd.status != '' and pd.status != 3">
+			and c.STATUS = #{pd.status}
+		</if>	
+		order by c.CREATETIME desc
+	</select>
+	
+	<!-- 查询认领审核详情 -->
+	<select id="queryClaimById" parameterType="pd" resultType="pd">
+		select c.*,e.ENTNAME,m.USERNAME,m.ALIASNAME,m.PASSWORD,r.CREATEUSER_NAME,r.RESULTREMARK,r.CREATETIME from bl_claim c
+			left join bl_responded r on c.ID = r.RELATION_ID	
+			left join bl_enteradditioninfo e on c.PRIPID = e.PRIPID
+			left join bl_member m on c.MEMBER_ID = m.ID
+		where c.ID = #{id}
+	</select>
+	
+	<!-- 查询某个类型的附件材料信息 -->
+	<select id="queryAttachmentById" parameterType="pd" resultType="pd">
+		select * from bl_attachment where RELATION_ID = #{id}
+	</select>
+	
+	<!-- 修改认领审核信息 -->
+	<update id="updateClaim" parameterType="pd">
+		update bl_claim
+		<set>
+			<if test="status != null">STATUS = #{status}</if>
+		</set>
+		where ID = #{cid} and STATUS = 0
+	</update>
+	
+	<!-- 添加管理审核信息 -->
+	<insert id="insertResponded" parameterType="pd">
+		insert into bl_responded(ID,RELATION_ID,TYPE_ID,CREATEUSER_ID,CREATEUSER_NAME,CREATETIME,RESULTREMARK)
+			values (#{rid},#{cid},#{type},#{uid},#{uname},NOW(),#{remark})
+	</insert>
+	
+	<!-- 添加后台管理员信息 -->
+	<insert id="insertSysUser" parameterType="pd">
+		insert into sys_user (USER_ID,USERNAME,PASSWORD,NAME,STATUS,REMARK,EMAIL,PHONE,MEMBER_ID,PRIPID)
+			values (#{sysId},#{username},#{password},#{username},#{sysStatus},#{sysRemark},#{email},#{tel},#{memberId},#{pripid})
+	</insert>
+	
+	<!-- 添加管理员角色信息 -->
+	<insert id="insertUserRole" parameterType="pd">
+		insert into sys_user_role (ID,ROLE_ID,USER_ID,CREATEUSER_ID,CREATETIME,REMARK)
+			values (#{urId},#{roleId},#{sysId},#{uid},NOW(),#{sysRemark})
+	</insert>
+	
+	<!-- 查询是否有过成功认领记录 -->
+	<select id="queryClaimByMid" parameterType="pd" resultType="pd">
+		select * from bl_claim where STATUS = 1 and MEMBER_ID = #{memberId}
+	</select>
+	
+</mapper>

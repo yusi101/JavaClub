@@ -1,0 +1,27 @@
+#close {
+	background: url(img/close.png) no-repeat;
+	width: 30px;
+	height: 30px;
+	cursor: pointer; /*把鼠标变成手指*/
+	position: absolute;
+	right: 5px;
+	top: 15px;
+	text-indent: -999em;
+}
+
+#mask {
+	background-color: #333;
+	opacity: 0.8;
+	filter: alpha(opacity = 80); /*支持IE的透明度*/
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: 1000;
+}
+
+#ImageScale {
+	position: fixed;
+	z-index: 1001;
+	width: 380px;
+	height: 360px;
+}

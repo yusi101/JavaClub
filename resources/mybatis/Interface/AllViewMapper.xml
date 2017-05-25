@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AllViewMapper">
+	<!-- 返回结果集Map -->
+	<resultMap type="Map" id="AllView"></resultMap>
+	
+	<!-- 全景查询 -->
+	<select id="queryAllView" resultMap="AllView,AllView,AllView,AllView,AllView,AllView,AllView,AllView,AllView,AllView,AllView,AllView" useCache="false" 
+		statementType="CALLABLE" parameterType="pd">
+		CALL SP_Get_AllView(#{pripid},#{regno})
+	</select>	
+	
+</mapper>

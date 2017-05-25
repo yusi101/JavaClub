@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PledgeMapper">
+
+	
+	
+	<!-- 股权出质登记信息 分页 -->
+	<select id="queryPledgeInfolistPage" parameterType="page" resultType="pd" useCache="false">
+		SELECT REGNO,EQUITYNO,PLEDGOR,PLEDBLICNO,PLEDBLICTYPE_CN,IMPAM,IMPORG,IMPORGBLICNO,ENTNAME,
+			DATE_FORMAT(EQUPLEDATE,'%Y-%m-%d') AS EQUPLEDATE,DATE_FORMAT(PUBLICDATE,'%Y-%m-%d') AS PUBLICDATE 
+			FROM E_SP_PLEDGE P
+			WHERE 1=1
+		<if test="pd.pripid != null and pd.pripid != ''">
+	      AND P.PRIPID=#{pd.pripid}
+	    </if>      
+	</select>
+    
+    <!-- 股权出质登记信息  不分页 -->
+	<select id="queryPledgeInfo" parameterType="pd" resultType="pd" useCache="false">
+		SELECT REGNO,EQUITYNO,PLEDGOR,PLEDBLICNO,PLEDBLICTYPE_CN,IMPAM,IMPORG,IMPORGBLICNO,ENTNAME,
+			DATE_FORMAT(EQUPLEDATE,'%Y-%m-%d') AS EQUPLEDATE,DATE_FORMAT(PUBLICDATE,'%Y-%m-%d') AS PUBLICDATE 
+			FROM E_SP_PLEDGE P
+			WHERE 1=1 
+		<if test="pripid != null and pripid != ''">
+	      AND P.PRIPID=#{pripid}
+	    </if>         
+	</select>
+</mapper>

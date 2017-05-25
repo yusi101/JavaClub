@@ -1,0 +1,71 @@
+@CHARSET "UTF-8";
+
+.btn-add {
+	text-shadow: 0 0 0 rgba(0, 0, 0, 0.25);
+	background: #5cb85c;
+	border-color: #4cae4c;
+	color: #fff;
+}
+
+.btn-del {
+	text-shadow: 0 0 0 rgba(0, 0, 0, 0.25);
+	background: #d9534f;
+	border-color: #d43f3a;
+	color: #fff;
+}
+
+.btn-edit {
+	text-shadow: 0 0 0 rgba(0, 0, 0, 0.25);
+	background: #428bca;
+	border-color: #357ebd;
+	color: #fff;
+}
+
+.btn-detail {
+	text-shadow: 0 0 0 rgba(0, 0, 0, 0.25);
+	background: #5bc0de;
+	border-color: #46b8da;
+	color: #fff;
+}
+
+.btn-search {
+	text-shadow: 0 0 0 rgba(0, 0, 0, 0.25);
+    background: #65cea7;
+    border-color: #62cea7;
+	color: #fff;
+}
+
+.btn-confirm {
+	text-shadow: 0 0 0 rgba(0, 0, 0, 0.25);
+	background: #428bca;
+	border-color: #357ebd;
+	color: #fff;
+}
+
+.btn-cancel {
+	text-shadow: 0 0 0 rgba(0, 0, 0, 0.25);
+    background: #fff;
+    border-color: #ccc;
+    color: #333;
+}
+
+.btn-through {
+	text-shadow: 0 0 0 rgba(0, 0, 0, 0.25);
+	background: #5cb85c;
+	border-color: #4cae4c;
+	color: #fff;
+}
+
+.btn-nothrough {
+	text-shadow: 0 0 0 rgba(0, 0, 0, 0.25);
+	background: #d9534f;
+	border-color: #d43f3a;
+	color: #fff;
+}
+
+.btn-apply {
+	text-shadow: 0 0 0 rgba(0, 0, 0, 0.25);
+	background: #5cb85c;
+	border-color: #4cae4c;
+	color: #fff;
+}

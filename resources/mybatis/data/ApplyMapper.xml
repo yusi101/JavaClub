@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ApplyMapper">
+
+	<!-- 查询牌照在线申请记录 -->
+	<select id="queryApplyinfolistPage" resultType="pd" parameterType="page">
+		select qa.*,qp.STATUS QPSTATUS,qp.ID PID 
+			from lp_qrcode_apply qa
+			left join lp_qrcode_print qp on qa.ID = qp.RELATION_ID
+			where qa.PRIPID = #{pd.pripid} order by qa.CREATETIME desc
+	</select>
+
+	<!-- 查询企业信息 -->
+	<select id="queryApplyInfo" parameterType="pd" resultType="pd">
+		SELECT ENTNAME,PRIPID,REGNORE,UNISCID FROM bl_enteradditioninfo
+			WHERE PRIPID = #{pripid}
+	</select>
+	
+	<!-- 查询审核牌照申请记录 -->
+	<select id="queryApplylistPage" resultType="pd" parameterType="page">
+		select qa.*,qp.STATUS QPSTATUS,qp.ID PID from lp_qrcode_apply qa
+			left join lp_qrcode_print qp on qa.ID = qp.RELATION_ID
+			where qa.status = '0'
+		<if test="pd.entname != null and pd.entname != ''">
+			and qa.ENTNAME LIKE CONCAT(CONCAT('%', #{pd.entname}),'%')
+		</if>
+		<if test="pd.pripid != null and pd.pripid != ''">
+			and qa.PRIPID = #{pd.pripid}
+		</if>
+			order by qa.CREATETIME desc
+	</select>
+	
+	<!-- 查询牌照在线审核详情 -->
+	<select id="queryApplyById" parameterType="pd" resultType="pd">
+		select qa.APPLYWAY_CN,qa.APPLY_NAME,qa.APPLYTYPE_CN,qa.ENTNAME,qa.PRIPID,qa.REGNO,qa.APPLY_NUMBER,qa.ID,
+			qa.CERTYPE_CN,qa.CERNO,qa.APPLY_NUMBER,br.RESULTREMARK,br.CREATETIME,br.CREATEUSER_NAME from lp_qrcode_apply qa
+			left join bl_responded br on br.RELATION_ID = qa.ID
+			where qa.ID = #{id}
+	</select>
+	
+	<!-- 修改牌照申请状态 -->
+	<update id="updateApplyById" parameterType="pd">
+		update lp_qrcode_apply set STATUS = #{astatus} where ID = #{aid}
+	</update>
+
+	<!-- 添加管理员回复信息 -->
+	<insert id="insertResponded" parameterType="pd">
+		insert into bl_responded (ID,RELATION_ID,TYPE_ID,CREATEUSER_ID,CREATEUSER_NAME,CREATETIME,RESULTREMARK)
+			values (#{id},#{aid},#{typeId},#{uid},#{uname},NOW(),#{resultremark})
+	</insert>
+	
+</mapper>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="EntCourseMapper">
+	
+	<!-- 查询企业历程 -->
+	<select id="queryEntCourse" resultType="pd" useCache="false" parameterType="pd">
+		CALL SP_Get_EntCourse(#{pripid},#{regno},#{priptype})
+	</select>	
+	
+	<!-- 招聘详情 -->
+	<select id="queryJobInfo" resultType="pd" parameterType="pd" useCache="false">
+		select ID,ENTNAME,PRIPID,POSITION,SITE,SALARY,RELEASE_DATE,FETCH_URL,FETCH_TIME,VISIT_NUM,FETCH_WEBSITE,DETAIL 
+			from zr_lc_jobinfo where ID = #{id} 
+	</select>
+	
+	<!-- 招标详情 -->
+	<select id="queryBiddin" resultType="pd" parameterType="pd" useCache="false">
+		select ID,ENTNAME,PRIPID,TITLE,DATE_FORMAT(RELEASE_DATE,'%Y-%m-%d') AS RELEASE_DATE,FETCH_URL,FETCH_TIME,VISIT_NUM,FETCH_WEBSITE,LOCAL_AREA,INDUSTRY,DETAIL 
+			from ZR_LC_BIDDING where id = #{id} 
+	</select>
+	
+	<!-- 新闻详情 -->
+	<select id="queryEntnews" resultType="pd" parameterType="pd" useCache="false">
+		select ID,TITLE,ORIGIN,DESCRIPTION,RELEASE_DATE,FETCH_URL,FETCH_TIME,VISIT_NUM,ENTNAME,PRIPID,FETCH_WEBSITE,CONTENT TXT 
+			from ZR_LC_ENTNEWS where id = #{id} 
+	</select>
+	
+	<!-- 专利详情 -->
+	<select id="queryPatent" resultType="pd" parameterType="pd" useCache="false">
+		select ID,PRIPID,ENTNAME,PATENTNAME,RCODE,DATE_FORMAT(RDATE,'%Y-%m-%d') AS  RDATE,ACODE, DATE_FORMAT(ADATE,'%Y-%m-%d') AS ADATE,
+	    	AGENCY,INVENTOR,PATENTTYPE,IPCNAME,IPCCODE,LEGALSTATUS,DETAILINFO,ABSTRACTGRAPH,AGENT,RCODECN,LAWTIME,RCODECNDATE
+			from ZR_LC_PATENT 
+			where id = #{id} 
+	</select>	
+	
+	<!-- 商标详情 -->
+	<select id="queryBrand" resultType="pd" parameterType="pd" useCache="false">
+		SELECT B.ID,B.PRIPID,B.REGNO,B.UNISCID,B.ENTNAME,B.BRANDNAME,B.REGCORE,B.CLASSIFYID,B.BRANDSTAUTS,B.APPLICANT,
+     		B.APPLICATIONDATE,B.BRANDLIST,B.PROCEDURE,B.LIFESPAN,B.AGENCY,B.BRANDIMG
+     		FROM ZR_LC_BRAND B  where id = #{id} 
+	</select>
+	
+	<!-- 企业变更详情 -->
+	<select id="queryEntRecoder" resultType="pd" parameterType="pd" useCache="false">
+		select * from E_ALTER_RECODER where PRIPID = #{id} and ALTDATE >= '2014-03-01' order by ALTDATE DESC
+	</select>
+	
+	<!-- 个体变更详情 -->
+	<select id="querySingleRecoder" resultType="pd" parameterType="pd" useCache="false">
+		select * from E_GT_ALTER_RECODER where PRIPID = #{id} order by ALTDATE
+	</select>
+	
+	<!-- 著作权 -->
+	<select id="queryWorkcopyRight" resultType="pd" parameterType="pd" useCache="false">
+		select ID,PRIPID,REGNO,UNISCID,ENTNAME,REGISTERID,REGISTERDATA,WORKNAME,WORKCLASS,WORKOWNER,FINISHDATE,FIRSTDATE 
+			from zr_lc_workcopyright where id = #{id} 
+	</select>
+	
+	<!-- 软件著作权 -->
+	<select id="queryCopyright" resultType="pd" parameterType="pd" useCache="false">
+		select ID,PRIPID,REGNO,UNISCID,ENTNAME,REGISTERID,CATEGORYID,SOFTWARENAME,SOFTWARESHORT,VERSIONNUMBER,OWNERNAME,STARTINGDATE,REGISTERDATA 
+			from ZR_LC_COPYRIGHT where id = #{id}
+	</select>
+	
+	<!-- 荣誉信息 -->
+	<select id="queryHonorinfo" resultType="pd" parameterType="pd" useCache="false">
+		select HONORID,REGNORE,ENTNAME,HONORNAME,HONORCONTENT,ANNUAL,ORGAN,ADDTIME,SOURCE,STATE,DELETEMARK,SOURCENAME,SUPDEPARTMENT,UPDEPARTMENTNAME,BUSINESSATT,
+			UPDATETIME,USERNAME,C_OLDID,C_SOURCE_TYPE,C_UNIQUE_CODE,DEPID
+			from ZR_HONORINFO where HONORID = #{id}
+	</select>
+	
+</mapper>

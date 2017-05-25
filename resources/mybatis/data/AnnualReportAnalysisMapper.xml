@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AnnualReportAnalysisMapper">
+
+	<select id="queryAnnualrlinfo" parameterType="pd" resultType="pd">
+	SELECT TYPE,TOTAL_CAPITAL,TOTAL_COUNT,AREA_CODE,AREA_NAME,INDUSTRYPHY,ANCHEYEAR FROM zr_analysis_capital
+	<!-- 市场主体类型 1为企业，2为农专，3为个体 -->
+		<!-- 资金总额 -->
+	<!-- 市场主体数量 -->
+		<!-- 区域编码 -->
+	<!--  区域名称-->
+		<!-- 行业门类 -->
+	<!-- 年度 -->
+	</select>
+<select id="queryAnnualrindustry" parameterType="pd" resultType="pd">
+	SELECT * FROM zr_analysis_capital 
+	<if test="industry != null and industry != ''">
+		  	WHERE  INDUSTRYPHY = #{industry}
+	</if>  
+	</select>
+
+</mapper>

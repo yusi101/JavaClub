@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="KchcInfoMapper">
+
+	<!-- 获取重用守信合同信息 -->
+	<select id="queryKchcInfolistPage" parameterType="page" resultType="pd">
+	    SELECT PRIPID,ENTNAME,
+	    REGNO,UNISCID,CONTENT,
+	    DATE_FORMAT(IDENTIFYDATE,'%Y-%m-%d') AS IDENTIFYDATE,
+	    CASE WHEN STATE='0' THEN '有效' ELSE '无效' END STATE,
+	    IDENTIFYORGANS FROM ZR_LC_KCHCINFO 
+        WHERE 1=1
+        <if test="pd.pripid != null and pd.pripid != ''">
+			AND PRIPID=#{pd.pripid}
+		</if>   
+	</select>
+    
+    <!-- 获取重用守信合同信息 -->
+	<select id="queryKchcInfo" parameterType="pd" resultType="pd">
+	    SELECT PRIPID,ENTNAME,
+	    REGNO,UNISCID,CONTENT,
+	    DATE_FORMAT(IDENTIFYDATE,'%Y-%m-%d') AS IDENTIFYDATE,
+	    CASE WHEN STATE='0' THEN '有效' ELSE '无效' END STATE,
+	    IDENTIFYORGANS FROM ZR_LC_KCHCINFO 
+        WHERE 1=1
+        <if test="pripid != null and pripid != ''">
+			AND PRIPID=#{pripid}
+		</if>  
+	</select>
+</mapper>

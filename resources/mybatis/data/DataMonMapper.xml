@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DataMonMapper">
+	
+	<select id="queryCommentlistPage" parameterType="page" resultType="pd">
+		SELECT E.ENTNAME,M.USERNAME,M.ALIASNAME,B.REMARK,B.ID,B.STATUS,B.PID,B.SUCCESSQTY,B.FAILEDQTY,
+	    DATE_FORMAT(B.CREATETIME,'%Y-%m-%d') AS COMMENTTIME FROM BL_ENTERADDITIONINFO E,
+	    BL_MEMBER M,BL_COMMENT B WHERE E.PRIPID=B.PRIPID AND B.MEMBER_ID=M.ID 
+       	<if test=" pd.aliasname != null and  pd.aliasname != ''">
+			AND M.ALIASNAME LIKE CONCAT(CONCAT('%',#{ pd.aliasname}),'%') 
+		</if>
+		<if test=" pd.ID != null and  pd.ID != ''">
+			AND B.ID = #{ ID} 
+		</if>
+		<if test=" pd.status != null and  pd.status != '' and  status != 3">
+			and B.STATUS = #{ status}
+		</if>
+        <if test=" pd.startDay != null and   pd.startDay != '' ">
+		  	<![CDATA[ AND DATE_FORMAT(B.CREATETIME,'%Y-%m-%d') >= #{ pd.startDay} ]]>
+		</if>
+		<if test=" pd.endDay != null and  pd.endDay != '' ">
+		   	<![CDATA[ AND DATE_FORMAT(B.CREATETIME,'%Y-%m-%d') <= #{ pd.endDay} ]]>
+		</if>
+		
+		ORDER BY B.STATUS ASC, B.CREATETIME DESC
+	</select>
+	<!-- 查询企业表数据更新情况 -->
+	<select id="queryDataMonqy" parameterType="pd" resultType="pd">
+		SELECT COUNT(1) AS NUM,MAX(S_EXT_DATATIME) AS D_ADDTIME from e_baseinfo zr WHERE 1=1
+		<if test="startDay != null and  startDay != '' ">
+		  	<![CDATA[ AND DATE_FORMAT(zr.S_EXT_DATATIME,'%Y-%m-%d %H:%M:%S') >= #{ startDay} ]]>
+		</if>
+		<if test="endDay != null and endDay != '' ">
+		   	<![CDATA[ AND DATE_FORMAT(zr.S_EXT_DATATIME,'%Y-%m-%d %H:%M:%S') <= #{ endDay} ]]>
+		</if>
+	</select>
+	
+	<!-- 查询个体表数据更新情况 -->
+	<select id="queryDataMongt" parameterType="pd" resultType="pd">
+		SELECT COUNT(1) AS NUM,MAX(S_EXT_DATATIME) AS D_ADDTIME from e_pb_baseinfo zr WHERE 1=1 
+		<if test="startDay != null and startDay != '' ">
+		  	<![CDATA[ AND DATE_FORMAT(zr.S_EXT_DATATIME,'%Y-%m-%d %H:%M:%S') >= #{ startDay} ]]>
+		</if>
+		<if test="endDay != null and endDay != '' ">
+		   	<![CDATA[ AND DATE_FORMAT(zr.S_EXT_DATATIME,'%Y-%m-%d %H:%M:%S') <= #{ endDay} ]]>
+		</if>
+	</select>
+	
+	<!-- 查询 新企业 表数据更新情况 -->
+	<select id="queryDataMonnew" parameterType="pd" resultType="pd">
+		SELECT COUNT(1) AS NUM,MAX(D_ADDTIME) AS D_ADDTIME,(SELECT COUNT(1) from zr_qydjxx zr WHERE 1=1 ) AS SUMS,(SELECT MAX(D_ADDTIME) from zr_qydjxx zr WHERE 1=1 ) AS MAXTIME from zr_qydjxx zr WHERE 1=1 
+		<if test="startDay != null and startDay != '' ">
+		  	<![CDATA[ AND DATE_FORMAT(zr.D_ADDTIME,'%Y-%m-%d %H:%M:%S') >= #{ startDay} ]]>
+		</if>
+		<if test="endDay != null and endDay != '' ">
+		   	<![CDATA[ AND DATE_FORMAT(zr.D_ADDTIME,'%Y-%m-%d %H:%M:%S') <= #{ endDay} ]]>
+		</if>
+	</select>
+	
+	<!-- 查询 企业 表7天数据更新情况 -->
+	<select id="queryEntSevenDaysData" parameterType="pd" resultType="pd">
+		select DATE_FORMAT(S_EXT_DATATIME,'%Y年%m月%d日') days,COUNT(1) AS num 
+		from e_baseinfo where 
+		 <![CDATA[ date_sub(curdate(), INTERVAL 7 DAY) <= date(S_EXT_DATATIME) ]]>
+		GROUP BY days ORDER BY S_EXT_DATATIME 
+	</select>
+	
+	<!-- 查询 个体 表7天数据更新情况 -->
+	<select id="queryGtSevenDaysData" parameterType="pd" resultType="pd">
+		select DATE_FORMAT(S_EXT_DATATIME,'%Y年%m月%d日') days,COUNT(1) AS num 
+		from e_pb_baseinfo where 
+		<![CDATA[ date_sub(curdate(), INTERVAL 7 DAY) <= date(S_EXT_DATATIME) ]]>
+		GROUP BY days ORDER BY S_EXT_DATATIME 
+	</select>
+	
+	<!-- 查询 新企业 表7天数据更新情况 -->
+	<select id="queryNewSevenDaysData" parameterType="pd" resultType="pd">
+		select DATE_FORMAT(D_ADDTIME,'%Y年%m月%d日') days,COUNT(1) AS num 
+		from zr_qydjxx where 
+		 <![CDATA[ date_sub(curdate(), INTERVAL 7 DAY) <= date(D_ADDTIME) ]]>
+		GROUP BY days ORDER BY D_ADDTIME 
+	</select>
+</mapper>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SupportMapper">
+
+	<!-- 得到 -->
+	<select id="querySupportinfolistPage" parameterType="page" resultType="pd">
+		SELECT PRIPID,ENJSPAMOUNT,ENJSPCONTENT,IMPSPDEPART,DATE_FORMAT(IMPSPDATE,'%Y-%m-%d') as IMPSPDATE
+			FROM E_SM_SUPPORT S
+			WHERE 1=1 
+		 <if test="pd.pripid != null and pd.pripid != ''">
+	      AND S.PRIPID=#{pd.pripid}
+	     </if>
+	</select>
+
+	<select id="querySupportinfo" parameterType="String" resultType="Map">
+		SELECT PRIPID,ENJSPAMOUNT,ENJSPCONTENT,IMPSPDEPART,DATE_FORMAT(IMPSPDATE,'%Y-%m-%d') as IMPSPDATE
+			FROM E_SM_SUPPORT S
+			WHERE 1=1
+		 <if test="pripid != null and pripid != ''">
+	      AND S.PRIPID=#{pripid}
+	     </if>
+	</select>
+
+</mapper>

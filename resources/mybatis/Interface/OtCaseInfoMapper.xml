@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="OtCaseInfoMapper">
+
+	<!-- 获取行政处罚信息  -->
+	<select id="queryOtCaseInfolistPage" parameterType="page" resultType="pd">
+         SELECT CASEID,
+         PRIPID,PENDECNO,JUDAUTH,ILLEGACTTYPE,PENAM,FORFAM,
+         PENCONTENT,DATE_FORMAT(PENDECISSDATE,'%Y-%m-%d') AS  PENDECISSDATE,
+         CASE WHEN TYPE=1 THEN '有效' ELSE '无效' END TYPE,
+         <if test="pd.caseId != null and pd.caseId != ''">
+         	Remark, ENTNAME,PENDECCONTENT,DWFDDBR,UNISCID,
+         </if>
+          DATE_FORMAT(PENDECISSDATE,'%Y-%m-%d') AS PUBLICDATE
+         FROM E_OT_CASE 
+         WHERE 1=1
+          <if test="pd.pripid != null and pd.pripid != ''">
+         	AND PRIPID = #{pd.pripid} 
+         </if>
+          <if test="pd.caseId != null and pd.caseId != ''">
+         	AND CASEID = #{pd.caseId} 
+         </if>
+	</select>
+	
+	
+    <!-- 获取行政处罚信息  -->
+	<select id="queryOtCaseInfo" parameterType="pd" resultType="pd">
+         SELECT CASEID,
+         PRIPID,PENDECNO,JUDAUTH,ILLEGACTTYPE,PENAM,FORFAM,
+         PENCONTENT,DATE_FORMAT(PENDECISSDATE,'%Y-%m-%d') AS  PENDECISSDATE,
+         CASE WHEN TYPE=1 THEN '有效' ELSE '无效' END TYPE,
+         <if test="caseId != null and caseId != ''">
+         	Remark, ENTNAME,PENDECCONTENT,DWFDDBR,UNISCID,
+         </if>
+          DATE_FORMAT(PENDECISSDATE,'%Y-%m-%d') AS PUBLICDATE
+         FROM E_OT_CASE 
+         WHERE 1=1
+          <if test="pripid != null and pripid != ''">
+         	AND PRIPID = #{pripid} 
+         </if>
+          <if test="caseId != null and caseId != ''">
+         	AND CASEID = #{caseId} 
+         </if>
+	</select>
+</mapper>

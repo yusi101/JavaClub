@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BaseInfoMapMapper">
+
+	<!-- 地图 -->
+	<select id="queryBaseInfoList" parameterType="pd" resultType="pd">
+		SELECT ent.MAPX,ent.MAPY,ent.PRIPID,ent.DOM FROM lp_qrcode_print qp
+			LEFT JOIN lp_qrcode_apply qa ON qp.RELATION_ID = qa.ID
+			LEFT JOIN bl_enteradditioninfo ent ON qa.PRIPID = ent.PRIPID
+			WHERE qp.STATUS = 7 
+			<if test="C_COUNTY !='' and C_COUNTY != null ">
+				AND C_COUNTY LIKE CONCAT(CONCAT(#{C_COUNTY}),'%')
+			</if>
+	</select>
+
+	<!-- 查看详情 -->
+	<select id="findBaseInfoById" parameterType="pd" resultType="pd">
+		SELECT PRIPID,UNISCID,REGNORE AS REGNO,ENTNAME,NAME,DOM 
+			FROM bl_enteradditioninfo 
+			WHERE PRIPID = #{PRIPID}
+	</select>
+	
+	<!-- 查询省市县 -->
+	<select id="queryCityList" parameterType="pd" resultType="pd">
+		SELECT C_NAME,C_CODE FROM ZR_SYS_AREA 
+		WHERE C_AREA_LEVEL = #{C_AREA_LEVEL} 
+		<if test="C_CODE !='' and C_CODE != null ">
+			AND C_CODE LIKE CONCAT(CONCAT(#{C_CODE}),'%')
+		</if>
+	</select>
+	
+	<!-- 统计某个区域有多少牌照未领取 -->
+	<select id="queryCount" parameterType="pd" resultType="int">
+	SELECT count(1) FROM lp_qrcode_print qp
+			LEFT JOIN lp_qrcode_apply qa ON qp.RELATION_ID = qa.ID
+			LEFT JOIN bl_enteradditioninfo ent ON qa.PRIPID = ent.PRIPID
+			WHERE qp.STATUS = 7 
+			AND C_COUNTY LIKE CONCAT(CONCAT(#{C_CODE}),'%')
+	</select>
+	
+</mapper>

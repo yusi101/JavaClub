@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CarouselMapper">
+
+	
+	<!-- 查找对应的轮播图片-->
+   <select id="queryCarouseInfoListPage"  useCache="false" resultType="pd" parameterType="page">
+		 SELECT C.ID,C.NAME,C.PATH,C.ORDERBY,C.TOURL,C.CREATETIME,C.CREATEUSER_ID,C.CREATEUSER_NAME,C.AREA_CODE
+		 FROM SYS_CAROUSEL C
+		 WHERE 1=1
+		 <if test="pd.id != null and pd.id != ''">
+	    	AND C.ID=#{pd.id}
+	     </if>
+	     <if test="pd.name != null and pd.name != ''">
+	    	AND C.name=#{pd.name}
+	     </if>
+	     <if test="pd.areaCode != null and pd.areaCode != ''">
+	    	AND C.AREA_CODE=#{pd.areaCode}
+	     </if>
+	     <if test="pd.userName != null and pd.userName != ''">
+	    	AND C.CREATEUSER_NAME=#{pd.userName}
+	     </if>
+		 ORDER BY C.ORDERBY  DESC
+	</select>
+	
+	
+	<!-- 查找对应的轮播图片-->
+   <select id="queryCarouseInfo"  useCache="false" resultType="pd" parameterType="pd">
+		  SELECT C.ID,C.NAME,C.PATH,C.ORDERBY,C.TOURL,C.CREATETIME,C.CREATEUSER_ID,C.CREATEUSER_NAME,C.AREA_CODE
+		 FROM SYS_CAROUSEL C
+		 WHERE 1=1
+		 <if test="id != null and id != ''">
+	    	AND C.ID=#{id}
+	     </if>
+	     <if test="name != null and name != ''">
+	    	AND C.name=#{name}
+	     </if>
+	     <if test="areaCode != null and areaCode != ''">
+	    	AND C.AREA_CODE=#{areaCode}
+	     </if>
+	     <if test="userName != null and userName != ''">
+	    	AND C.CREATEUSER_NAME=#{userName}
+	     </if>
+	     <if test="brandName != null and brandName != ''">
+	    	AND C.name=#{brandName}
+	     </if>
+		 ORDER BY C.ORDERBY  DESC
+	</select>
+	
+	<!-- 添加轮播图 -->
+	<insert id="insertCarouse" parameterType="pd">
+		INSERT INTO SYS_CAROUSEL(ID,NAME,PATH,ORDERBY,TOURL,CREATETIME,CREATEUSER_ID,CREATEUSER_NAME,AREA_CODE)
+		VALUES (#{id},#{name},#{path},#{orderBy},#{toUrl},now(),#{userId},#{userName},#{areaCode})
+	</insert>
+	
+	<!-- 修改轮播图 -->
+	<update id="updateCarouse" parameterType="pd">
+		UPDATE SYS_CAROUSEL SET CREATEUSER_ID=#{userId},CREATEUSER_NAME=#{userName},CREATETIME=now()
+		 <if test="name != null and name != ''">
+	    	,name=#{name}
+	     </if>
+	     <if test="path != null and path != ''">
+	    	,PATH=#{path}
+	     </if>
+	     <if test="orderBy != null and orderBy != ''">
+	    	,ORDERBY=#{orderBy}
+	     </if>
+	     <if test="toUrl != null and toUrl != ''">
+	    	,TOURL=#{toUrl}
+	     </if>
+	     <if test="areaCode != null and areaCode != ''">
+	    	,AREA_CODE=#{areaCode}
+	     </if>
+		 WHERE  id = #{id}
+	</update>
+	
+	<!-- 删除轮播图 -->
+	<delete id="deleteCarouse" parameterType="pd">
+		DELETE FROM SYS_CAROUSEL WHERE  ID =#{id}
+	</delete>
+</mapper>

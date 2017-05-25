@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link href="../../bootstrap2.3.2/css/bootstrap.min.css" rel="stylesheet" />
+	<title>详情页面</title>
+	<link href="../../styles/common.css" rel="stylesheet" />
+   	<link href="../../styles/demo/demo.css" rel="stylesheet" />
+</head>
+	
+<body>
+	<div class="form-horizontal">
+		<div style="height: 50px;"></div>
+	    <div class="control-group">
+	        <label class="control-label" for="userName">姓名</label>
+	        <div class="controls">
+	            <input type="text" id="userName" placeholder="姓名">
+	        </div>
+	    </div>
+	    <div class="control-group">
+	        <label class="control-label" for="Chinese">语文</label>
+	        <div class="controls">
+	            <input type="text" id="Chinese" placeholder="语文">
+	        </div>
+	    </div>
+	    <div class="control-group">
+	        <label class="control-label" for="Math">数学</label>
+	        <div class="controls">
+	            <input type="text" id="Math" placeholder="数学">
+	        </div>
+	    </div>
+	    <div class="control-group">
+	        <label class="control-label" for="English">英语</label>
+	        <div class="controls">
+	            <input type="text" id="English" placeholder="英语">
+	        </div>
+	    </div>    
+	    <div class="control-group">              
+	        <div class="controls">
+	            <input type="button" class="btn btn-primary" id="add" value="保存" onclick="add()" />
+	            <input type="button" class="btn btn-default" id="close" value="关闭" onclick="parent.layer.closeAll('iframe')" />
+	        </div>
+	   	</div>
+	</div>
+    <script src="../../scripts/jquery-1.9.1.min.js"></script>
+  	<script src="../../bootstrap2.3.2/js/bootstrap.min.js"></script>
+   	<script src="../../layer-v2.4/layer/layer.js"></script>
+   	<script src="../../scripts/demo/demo.js"></script>
+	</body>
+</html>

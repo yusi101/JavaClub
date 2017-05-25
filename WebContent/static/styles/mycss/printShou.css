@@ -1,0 +1,56 @@
+*{
+	margin:0;
+	padding:0;
+}
+#QRBase64Code img{
+	display: block;
+	height:120px;
+	width:120px;
+	float:right;
+}
+#apply_receipt {
+	width: 80%;
+	margin: 0 auto;
+}
+
+#apply_receipt h1 {
+	line-height: 70px;
+}
+
+#apply_receipt h2 {
+	line-height: 50px;
+	 margin-bottom:100px;
+}
+#apply_receipt table{
+
+}
+#apply_receipt table td {
+	height: 32px !important;
+	vertical-align: middle;
+	line-height: 25px;
+}
+
+#apply_receipt table .lable {
+	width: 120px;
+}
+table td{
+	border: 1px solid #ddd;
+    padding: 3px
+}
+.codeLists{
+    margin-top: 250px;
+}
+.codeList{
+	width: 100px;
+    float: right;
+    margin-left: 20px;
+}
+.codeList img{
+	width: 100px;
+	height:100px;
+    display: -webkit-box;
+    margin: 0 auto;
+}
+.codeList span{
+	font-size: 11px;
+}

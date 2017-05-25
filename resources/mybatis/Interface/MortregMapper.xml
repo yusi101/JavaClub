@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MortregMapper">
+
+	<!-- 获取动产或者不动产抵押登记信息 -->
+	<select id="queryMortregInfolistPage" parameterType="page" resultType="pd" useCache="false">
+	    SELECT MORREG_ID,
+	    MORREGCNO,DATE_FORMAT(REGIDATE,'%Y-%m-%d') AS REGIDATE,
+	    DATE_FORMAT(PUBLICDATE,'%Y-%m-%d') AS PUBLICDATE,
+	    REGORG_CN,
+	    (SELECT PRICLASECAM FROM MORT_PRINCIPAL_CLAIM WHERE MORREG_ID=M.MORREG_ID) AS PRICLASECAM 
+	    FROM MORT_REG_INFO M 
+	    WHERE PRIPID= #{pd.pripid}
+            
+	</select>
+	
+	<!-- 获取动产或者不动产抵押登记信息 -->
+	<select id="queryMortregInfo" parameterType="pd" resultType="pd" useCache="false">
+	    SELECT MORREG_ID,
+	    MORREGCNO,DATE_FORMAT(REGIDATE,'%Y-%m-%d') AS REGIDATE,
+	    DATE_FORMAT(PUBLICDATE,'%Y-%m-%d') AS PUBLICDATE,
+	    REGORG_CN,
+	    (SELECT PRICLASECAM FROM MORT_PRINCIPAL_CLAIM WHERE MORREG_ID=M.MORREG_ID) AS PRICLASECAM 
+	    FROM MORT_REG_INFO M 
+	    WHERE PRIPID= #{pripid}
+            
+	</select>
+	
+	<select id="queryChattelPledgeInfolistPage" parameterType="page" resultType="pd" useCache="false">
+	    SELECT PRIPID,C_INFOID,C_DYDJZH,
+	    DATE_FORMAT(D_DJRQ,'%Y-%m-%d') AS D_DJRQ,
+	    DATE_FORMAT(D_SQRQ,'%Y-%m-%d') AS D_SQRQ,
+	    (SELECT ORGAN_NAME FROM  ZR_SYS_ORGAN WHERE  ORGAN_NO=M.C_DJJG) AS C_DJJG,
+	    C_DBFW FROM ZR_ENT_GS_CHATTEL_PLEDGE M 
+	    WHERE PRIPID= #{pd.pripid}
+	</select>
+	
+	<select id="queryChattelPledgeInfo" parameterType="pd" resultType="pd" useCache="false">
+	    SELECT PRIPID,C_INFOID,C_DYDJZH,
+	    DATE_FORMAT(D_DJRQ,'%Y-%m-%d') AS D_DJRQ,
+	    DATE_FORMAT(D_SQRQ,'%Y-%m-%d') AS D_SQRQ,
+	    (SELECT ORGAN_NAME FROM  ZR_SYS_ORGAN WHERE  ORGAN_NO=M.C_DJJG) AS C_DJJG,
+	    C_DBFW FROM ZR_ENT_GS_CHATTEL_PLEDGE M 
+	    WHERE PRIPID= #{pripid}
+	</select>
+    
+</mapper>

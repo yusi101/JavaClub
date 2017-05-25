@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ComplainMapper">
+	
+	<!-- 查询全部的投诉审核 -->
+	<select id="queryComplainApplylistPage" parameterType="page" resultType="pd">
+		SELECT C.*,DATE_FORMAT(C.CREATETIME,'%Y-%m-%d %H:%m:%s') AS COMMENTTIME,E.ENTNAME,M.USERNAME,M.ALIASNAME,(SELECT NAME  FROM SYS_DICTIONARIES D WHERE D.ZD_ID=C.TYPE_ID) TYPE_NAME FROM BL_COMPLAINT C
+		LEFT JOIN BL_ENTERADDITIONINFO E ON C.PRIPID = E.PRIPID
+		LEFT JOIN BL_MEMBER M ON C.MEMBER_ID = M.ID
+		WHERE 1 = 1
+		<if test="pd.entname != null and pd.entname != ''">
+			and e.ENTNAME LIKE CONCAT(CONCAT('%', #{pd.entname}),'%') 
+		</if>		
+		<if test="pd.status != null and pd.status != '' and pd.status != 3">
+			and c.STATUS = #{pd.status}
+		</if>
+		 <if test="pd.startDay != null and  pd.startDay != '' ">
+		  	<![CDATA[ AND DATE_FORMAT(C.CREATETIME,'%Y-%m-%d') >= #{pd.startDay} ]]>
+		</if>
+		<if test="pd.endDay != null and pd.endDay != '' ">
+		   	<![CDATA[ AND DATE_FORMAT(C.CREATETIME,'%Y-%m-%d') <= #{pd.endDay} ]]>
+		</if>	
+		order by c.CREATETIME DESC
+	</select>
+	
+	<!-- 查询投诉审核详情 -->
+	<select id="queryComplainById" parameterType="pd" resultType="pd">
+		SELECT C.*,E.ENTNAME,M.USERNAME,M.ALIASNAME,R.CREATEUSER_NAME,R.RESULTREMARK,R.CREATETIME,(SELECT NAME FROM SYS_DICTIONARIES D WHERE D.ZD_ID=C.TYPE_ID) TYPE_NAME FROM BL_COMPLAINT C
+			LEFT JOIN BL_RESPONDED R ON C.ID = R.RELATION_ID	
+			LEFT JOIN BL_ENTERADDITIONINFO E ON C.PRIPID = E.PRIPID
+			LEFT JOIN BL_MEMBER M ON C.MEMBER_ID = M.ID
+		where c.ID = #{id}
+	</select>
+	
+	<!-- 查询某个投诉的附件材料信息 
+	<select id="queryAttachmentById" parameterType="pd" resultType="pd">
+		select * from bl_attachment where RELATION_ID = #{id}
+	</select> -->
+	
+	<!-- 修改投诉审核信息 -->
+	<update id="updateComplain" parameterType="pd">
+		update bl_complaint
+		<set>
+			<if test="status != null">STATUS = #{status}</if>
+		</set>
+		where ID = #{cid} and STATUS = 0
+	</update>
+	
+	<!-- 添加管理审核信息 
+	<insert id="insertResponded" parameterType="pd">
+		insert into bl_responded(ID,RELATION_ID,TYPE_ID,CREATEUSER_ID,CREATEUSER_NAME,CREATETIME,RESULTREMARK)
+			values (#{rid},#{cid},#{type},#{uid},#{uname},NOW(),#{remark})
+	</insert> -->
+</mapper>

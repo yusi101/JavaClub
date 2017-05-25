@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TaxMapper">
+
+	<select id="queryTax" parameterType="pd" resultType="pd">
+		SELECT ENTTYPE,RATGRO,YEAR,NUMBER FROM zr_tax
+	</select>
+<select id="queryTaxSum" parameterType="pd" resultType="pd">
+		SELECT SUM(RATGRO) AS RATGRO FROM zr_tax GROUP BY ENTTYPE ORDER BY ENTTYPE  
+	</select>
+</mapper>

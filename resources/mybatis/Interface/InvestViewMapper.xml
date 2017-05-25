@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="InvestViewMapper">
+	<!-- 返回结果集合 -->
+     <resultMap type="Map" id="InvestView"></resultMap>
+	
+	<!-- 投资链图 -->
+	<select id="queryInvestView" resultMap="InvestView,InvestView,InvestView,InvestView" useCache="false" 
+		statementType="CALLABLE" parameterType="pd">
+		CALL SP_Get_InvestView(#{pripid},#{regno})
+	</select>	
+	
+	<!-- 自然对外投资 -->
+	<select id="queryInvAllEnt" resultType="pd" parameterType="String" useCache="false">
+		select eb.PRIPID,eip.CERNO,eb.UNISCID,eb.ENTNAME,eb.REGNO,date_format(eb.ESTDATE,'%Y-%m-%d') ESTDATE,eb.REGSTATE_CN,eb.REGCAP,eb.NAME,eip.INV 
+			from E_INV_PERSON eip 
+			left join e_baseinfo eb 
+			on eip.pripid = eb.pripid 
+			where eip.cerno = #{cerno};
+	</select>
+	
+	<!-- 非自然对外投资 -->
+	<select id="queryInvestViewTwo" resultType="pd" parameterType="String" useCache="false">
+		select eb.ENTNAME,eb.NAME,eb.UNISCID,eb.REGNO,eb.REGCAP,date_format(eb.ESTDATE,'%Y-%m-%d') ESTDATE,eii.INV,eii.INVTYPE_CN,eii.SUBCONAM,eii.ACCONAM
+			from E_INV_INVESTMENT eii
+			left join E_BASEINFO eb
+			on eb.pripid = eii.pripid
+			where eii.blicno = #{regno};
+	</select>
+			
+</mapper>

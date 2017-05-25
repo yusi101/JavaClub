@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BiddingMapper">
+
+	<!-- 查询中标列表 -->
+	<select id="queryBiddingInfolistPage" parameterType="page"
+		resultType="pd" useCache="false">
+		SELECT
+		B.ID,
+		B.ENTNAME,
+		B.PRIPID,
+		B.TITLE,
+		DATE_FORMAT(B.RELEASE_DATE,
+		'%Y-%m-%d') AS RELEASE_DATE,
+		B.FETCH_URL,
+		B.FETCH_TIME,
+		B.VISIT_NUM,
+		B.FETCH_WEBSITE,
+		B.LOCAL_AREA,
+		B.INDUSTRY
+		<if test="pd.biddingId != null and pd.biddingId != ''">
+			,B.DETAIL
+		</if>
+		FROM
+		ZR_LC_BIDDING B WHERE 1 = 1
+		<if test="pd.entname != null and pd.entname != ''">
+			AND (B.ENTNAME LIKE	CONCAT(CONCAT('%',#{pd.entname}),'%') or B.TITLE LIKE CONCAT(CONCAT('%',#{pd.entname}),'%'))
+		</if>
+		<if test="pd.pripid != null and pd.pripid != ''">
+			AND B.pripid=#{pd.pripid}
+		</if>
+		<if test="pd.biddingId != null and pd.biddingId != ''">
+			AND B.ID=#{pd.biddingId}
+		</if>
+		ORDER BY B.RELEASE_DATE DESC
+	</select>
+
+
+	<!-- 查询中标列表 -->
+	<select id="queryBiddingInfo" parameterType="pd" resultType="pd">
+		SELECT
+		B.ID,
+		B.ENTNAME,
+		B.PRIPID,
+		B.TITLE,
+		DATE_FORMAT(B.RELEASE_DATE,
+		'%Y-%m-%d') AS RELEASE_DATE,
+		B.FETCH_URL,
+		B.FETCH_TIME,
+		B.VISIT_NUM,
+		B.FETCH_WEBSITE,
+		B.LOCAL_AREA,
+		B.INDUSTRY
+		<if test="biddingId != null and biddingId != ''">
+			,B.DETAIL
+		</if>
+		FROM
+		ZR_LC_BIDDING B WHERE 1 = 1
+		<if test="entname != null and entname != ''">
+			AND (B.ENTNAME LIKE	CONCAT(CONCAT('%',#{entname}),'%') or B.TITLE LIKE CONCAT(CONCAT('%',#{entname}),'%'))
+		</if>
+		<if test="pripid != null and pripid != ''">
+			AND B.pripid=#{pripid}
+		</if>
+		<if test="biddingId != null and biddingId != ''">
+			AND B.ID=#{biddingId}
+		</if>
+		ORDER BY B.RELEASE_DATE DESC
+	</select>
+
+
+
+
+</mapper>

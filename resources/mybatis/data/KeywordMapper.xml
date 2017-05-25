@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="KeywordMapper">
+	
+	<!-- 新增关键词 -->
+	<insert id="insertKeyword" parameterType="pd">
+		insert into sys_keyword (ID,KEYWORD,CREATEUSER_ID,CREATETIME,STATUS,TYPE)
+			values (#{uuId},#{keyword},#{uId},NOW(),#{status},#{type})
+	</insert>
+	
+	<!-- 查询全部关键词 -->
+	<select id="queryKeywordlistPage" parameterType="page" resultType="pd">
+		select * from sys_keyword s where 1=1
+		<if test="pd.ID != null and pd.ID != '' ">
+			and ID = #{pd.ID}
+		</if>
+		<if test="pd.STATUS != null and pd.STATUS != '' ">
+			and STATUS = #{pd.STATUS}
+		</if>
+		order by s.CREATETIME desc
+	</select>
+	
+	<!-- 查询全部关键词  不分页-->
+	<select id="queryKeyword" parameterType="pd" resultType="pd">
+		select * from sys_keyword s where 1=1
+		<if test="ID != null and ID != '' ">
+			and ID = #{ID}
+		</if>
+		<if test="STATUS != null and STATUS != '' ">
+			and STATUS = #{STATUS}
+		</if>
+		order by s.CREATETIME desc
+	</select>
+	
+		<!-- 删除关键词 -->
+	<delete id="deletekeyword" parameterType="pd">
+		DELETE FROM sys_keyword WHERE ID = #{ID}  
+		<!-- UPDATE SYS_KEYWORD set STATUS='1' WHERE ID = #{ID} -->
+	</delete>
+	
+	<!-- 查询单个关键词 -->
+	<select id="querykeywordByIdInfo" parameterType="pd" resultType="pd">
+		SELECT ID,KEYWORD,CREATEUSER_ID,CREATETIME,STATUS,TYPE 
+			FROM sys_keyword WHERE ID = #{KID}
+	</select>
+	<!-- 查询重复 -->
+	<select id="queryName" parameterType="pd" resultType="pd">
+		SELECT KEYWORD 
+			FROM sys_keyword WHERE KEYWORD = #{keyword}
+	</select>
+	 <!-- 修改关键词  -->
+	<update id="updatekeywordById" parameterType="pd">
+		UPDATE sys_keyword SET KEYWORD = #{keyword},CREATEUSER_ID = #{uId},CREATETIME = NOW(),STATUS = #{status},TYPE = #{type} WHERE ID = #{KID}
+	</update>
+</mapper>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="IndustryType2Mapper">
+
+	<!-- 查询南昌市教育业 -->
+	<select id="queryTypeEnt" parameterType="pd" resultType="pd">
+		 select * from bl_enteradditioninfo LIMIT 100
+		<!--  <if test="county != null and county != '' and county != '3601'">
+		 	and C_COUNTY = #{county}
+		 </if>
+		 <if test="industry != null and industry != ''">
+		  	and INDUSTRYPHY = #{industry}
+		 </if> -->
+	</select>
+	
+	<!-- 南昌市的区县 -->
+	<select id="queryCounty" parameterType="pd" resultType="pd">
+		 select * from zr_sys_area where c_code like '3601%' and C_STATE = '0' and C_CODE !='3601'
+	</select>
+	<!-- 南昌市的区县 -->
+	<!-- <select id="queryCounty" parameterType="pd" resultType="pd">
+		 SELECT AREA_NAME FROM zr_analysis_empnum WHERE AREA_CODE LIKE '3601%'  
+	</select>	 -->
+	
+	<!-- 所有行业 -->
+	<select id="queryIndustry" parameterType="pd" resultType="pd">
+		 select * from zr_sys_code where ec_code = 'CA05'
+	</select>
+	
+	<!-- 查询外商来源 -->
+	<select id="queryForeignInvestment" parameterType="pd" resultType="pd">
+ 		SELECT t2.c_name name,t1.num value from 
+ 			(select count(*) num,left(a.CERNO,2) cerno from E_INV_PERSON a 
+ 				where left(a.CERNO,2)  &lt;&gt; '36' 
+ 				group by left(a.CERNO,2)) t1,zr_sys_area t2
+			where t1.cerno = left(t2.C_CODE,2) and t2.C_AREA_LEVEL = 1	
+			order by value desc
+	</select>
+	
+	<!-- 查询人员-->
+	<select id="queryEmpnum" parameterType="pd" resultType="pd">
+		 SELECT * FROM zr_analysis_empnum WHERE AREA_CODE LIKE '3601%'
+		 <if test="industry != null and industry != ''">
+		  	and INDUSTRYPHY = #{industry}
+		 </if>  
+	</select>	
+	
+	
+</mapper>

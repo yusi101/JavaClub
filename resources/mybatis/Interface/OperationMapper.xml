@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="OperationMapper">
+
+	<!-- 查看详情 -->
+	<select id="queryOperationInfoXQ" parameterType="pd" resultType="pd">
+		select
+		o.entname name,
+		date_format(o.logtime, '%Y-%m-%d %T') as logtime,
+		count(o.entname) as value
+		from
+		sys_log_operation o
+		where
+		1 = 1
+		<if test="modulename != null and modulename != '' ">
+			and o.MODULENAME = #{modulename}
+		</if>
+		GROUP BY o.ENTNAME ORDER BY value DESC LIMIT 10
+	</select>
+
+
+	<!-- 查询每个公司的 访问量 -->
+	<select id="queryOperationlistPage" parameterType="page"
+		resultType="pd">
+		SELECT
+		ENTNAME,
+		DATE_FORMAT(S.LOGTIME, '%Y-%m-%d %T') AS
+		LOGTIME,
+		(
+		SELECT
+		ALIASNAME
+		FROM
+		BL_MEMBER M
+		WHERE
+		M.ID = S.MEMBER_ID
+		) AS
+		NAME,
+		MODULENAME
+		FROM
+		sys_log_operation S
+		WHERE
+		ENTNAME = #{pd.ENTNAME}
+		AND
+		MODULENAME = #{pd.MODULENAME}
+	</select>
+
+	<!-- 分类信息的统计 -->
+	<select id="queryClassifyInfo" parameterType="pd" resultType="pd">
+		SELECT o.modulename,COUNT(o.modulename) AS classifyCount FROM
+		sys_log_operation o where 1=1
+		<if test="startTime != null and startTime != '' ">
+		    <![CDATA[ AND DATE_FORMAT(o.LOGTIME,'%Y-%m-%d %T') >= DATE_FORMAT(#{startTime},'%Y-%m-%d %T') ]]>
+		</if>
+		<if test="endTime != null and endTime != '' ">
+		    <![CDATA[ AND DATE_FORMAT(o.LOGTIME,'%Y-%m-%d %T') <= DATE_FORMAT(#{endTime},'%Y-%m-%d %T') ]]>
+		</if>
+		GROUP BY o.modulename;
+	</select>
+
+
+
+
+	<!-- 点击系统流量分析详情 -->
+	<select id="querySystemFlowAnalysislistPage" parameterType="page"
+		resultType="pd">
+		SELECT
+		o.Logid,
+		O.ENTNAME,
+		O.MODULENAME,
+		O.LOGTIME,
+		(
+		SELECT
+		m.username
+		FROM
+		bl_member m
+		WHERE
+		m.id = o.MEMBER_ID
+		) username
+		FROM
+		sys_log_operation O
+		WHERE
+		DATE_FORMAT(
+		O.LOGTIME,
+		#{pd.SimpleDateFormat}) =
+		DATE_FORMAT(#{pd.logTime},#{pd.SimpleDateFormat})
+
+	</select>
+
+
+
+	<!-- 系统流量分析 -->
+	<select id="querySystemFlowAnalysis" parameterType="pd" resultType="pd">
+        SELECT COUNT(DATE_FORMAT(O.LOGTIME,#{SimpleDateFormat})) AS COUNT,DATE_FORMAT(O.LOGTIME,#{SimpleDateFormat}) TIME
+        FROM sys_log_operation O
+        WHERE 1=1
+        <if test="memberId != null and memberId != '' ">
+		     AND PRIPID IN (SELECT PRIPID FROM BL_ENTERADDITIONINFO WHERE ID IN(SELECT FK_CLAIM_ENTER FROM BL_CLAIMRESULT WHERE FK_CLAIM_MEMBER=#{memberId})) 
+		</if>
+        <if test="startTime != null and startTime != '' ">
+		    <![CDATA[ AND DATE_FORMAT(O.LOGTIME,'%Y-%m-%d %T') >= DATE_FORMAT(#{startTime},'%Y-%m-%d %T') ]]>
+		</if>
+        <if test="endTime != null and endTime != '' ">
+		    <![CDATA[ AND DATE_FORMAT(O.LOGTIME,'%Y-%m-%d %T') <= DATE_FORMAT(#{endTime},'%Y-%m-%d %T') ]]>
+		</if>
+         GROUP BY DATE_FORMAT(O.LOGTIME,#{SimpleDateFormat}) ORDER BY DATE_FORMAT(O.LOGTIME,#{SimpleDateFormat})
+	</select>
+</mapper>

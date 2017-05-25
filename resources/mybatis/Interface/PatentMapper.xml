@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PatentMapper">
+
+	<!-- 获取专利信息 -->
+	<select id="queryPatentinfolistPage" parameterType="page"
+		resultType="pd">
+		SELECT
+		P.ABSTRACTGRAPH,P.ACODE,P.ADATE,P.ADDTIME,P.AGENCY,P.AGENT,P.DETAILINFO,
+		P.ENTNAME,P.ID,P.INVENTOR,P.IPCCODE,P.IPCNAME,P.LAWTIME,P.LEGALSTATUS,P.PATENTNAME,
+		P.PATENTTYPE,P.PRIPID,P.RCODE,P.RCODECN,P.RCODECNDATE,P.RDATE,P.REGNO,P.UNISCID,
+		P.UPDATETIME FROM ZR_LC_PATENT P WHERE 1=1
+		<if test="pd.pripid != null and pd.pripid != ''">
+			AND P.PRIPID=#{pd.pripid}
+		</if>
+		<if test="pd.patentName != null and pd.patentName != ''">
+			AND P.PATENTNAME LIKE CONCAT('%',#{pd.patentName},'%')
+		</if>
+		<if test="pd.patentId != null and pd.patentId != ''">
+			AND P.ID = #{pd.patentId}
+		</if>
+		<if test="pd.entName != null and pd.entName != ''">
+			AND P.ENTNAME LIKE CONCAT('%',#{pd.entName},'%')
+		</if>
+		<if test="pd.classifyId != null and pd.classifyId != ''">
+			AND P.PATENTTYPE = #{pd.classifyId}
+		</if>
+		<if test="pd.classifyTime != null and pd.classifyTime != ''">
+			<![CDATA[ and DATE_FORMAT(P.RDATE,'%Y') = #{pd.classifyTime} ]]>
+		</if>
+		ORDER BY RDATE DESC
+	</select>
+
+
+	<!-- 获取专利信息 -->
+	<select id="queryPatentinfo" parameterType="pd" resultType="pd">
+		SELECT
+		P.ABSTRACTGRAPH,P.ACODE,P.ADATE,P.ADDTIME,P.AGENCY,P.AGENT,P.DETAILINFO,
+		P.ENTNAME,P.ID,P.INVENTOR,P.IPCCODE,P.IPCNAME,P.LAWTIME,P.LEGALSTATUS,P.PATENTNAME,
+		P.PATENTTYPE,P.PRIPID,P.RCODE,P.RCODECN,P.RCODECNDATE,P.RDATE,P.REGNO,P.UNISCID,
+		P.UPDATETIME FROM ZR_LC_PATENT P WHERE 1=1
+		<if test="pripid != null and pripid != ''">
+			AND P.PRIPID=#{pripid}
+		</if>
+		<if test="patentName != null and patentName != ''">
+			AND P.PATENTNAME LIKE CONCAT('%',#{patentName},'%')
+		</if>
+		<if test="patentId != null and patentId != ''">
+			AND P.ID = #{patentId}
+		</if>
+		<if test="entName != null and entName != ''">
+			AND P.ENTNAME LIKE CONCAT('%',#{entName},'%')
+		</if>
+		<if test="classifyId != null and classifyId != ''">
+			AND P.PATENTTYPE = #{classifyId}
+		</if>
+		<if test="classifyTime != null and classifyTime != ''">
+			<![CDATA[ and DATE_FORMAT(P.RDATE,'%Y') = #{classifyTime} ]]>
+		</if>
+		ORDER BY RDATE DESC
+	</select>
+
+
+	<!-- 获取专利类别信息 -->
+	<select id="queryPatentClass" parameterType="pd" resultType="pd">
+		select PATENTTYPE from zr_lc_patent
+		GROUP BY PATENTTYPE
+	</select>
+	
+	
+	
+	<!-- 获取专利信息1 -->
+	<select id="queryPatentinfolistPage1" parameterType="page" resultType="pd">
+		SELECT p.ID,p.RCODE,p.MAINIPCCODE,p.APPLICANT,p.PATENT_NAME,p.RDATE  FROM zr_lc_patent1 p WHERE 1=1
+		<if test="pd.patentName != null and pd.patentName != ''">
+			AND P.PATENT_NAME LIKE CONCAT('%',#{pd.patentName},'%')
+		</if>
+		<if test="pd.entName != null and pd.entName != ''">
+			AND P.APPLICANT LIKE CONCAT('%',#{pd.entName},'%')
+		</if>
+		
+		 ORDER BY RDATE DESC
+	</select>
+	
+	
+	
+	<!-- 获取专利信息详情1 -->
+	<select id="queryPatentinfoDetail" parameterType="pd" resultType="pd">
+		SELECT * FROM zr_lc_patent1 p 
+		WHERE ID = #{ID}
+	</select>
+	
+	<!-- 获取法律信息 -->
+	<select id="queryPatentinfoDetailLaw" parameterType="pd" resultType="pd">
+		SELECT * FROM zr_lc_patent_legal 
+		WHERE RELATION_ID = #{ID}
+	</select>
+	
+</mapper>

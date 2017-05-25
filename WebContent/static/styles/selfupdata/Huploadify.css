@@ -1,0 +1,176 @@
+@charset "utf-8";
+/* CSS Document */
+.uploadify-button {
+	display: inline-block;
+	margin: 12px;
+	border: 1px solid #808080;
+	background-color: #707070;
+	line-height: 24px;
+	border-radius: 12px;
+	padding: 0 18px;
+	font-size: 12px;
+	font-weight: 600;
+	font-family: '微软雅黑';
+	color: #FFF;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.uploadify-button:hover {
+	background-color: #888;
+}
+
+.uploadfile {
+	width: 0;
+}
+
+.uploadify-queue .uploadify-queue-item {
+	list-style-type: none;
+	margin-top: 10px;
+	position: relative;
+	border: 2px solid #000;
+}
+
+.uploadify-queue .uploadify-queue-item:hover>.uploadify_tools {
+	display: block;
+}
+
+.uploadify-queue .uploadify-queue-item:hover>.uploadify_tools .uploadifytoollist{
+	bottom: 0px;
+	display: block;
+}
+
+.uploadify-queue .uploadify-queue-item:hover>.uploadify_tools .delfilebtn{
+	top: 2px;
+	display: block;
+}
+
+.uploadify-queue .uploadify-queue-item:hover>.uploadify-progress {
+	display: block;
+}
+
+.uploadify-queue .uploadify-queue-item:hover>.up_filename {
+	display: block;
+}
+
+.uploadify-queue .uploadify-queue-item:hover>.progressnum {
+	display: block;
+}
+
+.uploadify-queue .uploadify-queue-item:hover>.up_percent {
+	display: block;
+}
+
+.uploadify-queue .uploadify-queue-item .uploadify_tools {
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.55);
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: none;
+}
+
+.uploadify-queue .uploadify-queue-item .uploadify_tools .uploadifytoollist{
+	background: rgba(0, 0, 0, 0.55) !important;
+	height: 28px;
+	width: 100%;
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -30px;
+	display: none;
+}
+
+.uploadify-queue .uploadify-queue-item .uploadify_tools  .uploadifytoollist ul{
+	-webkit-padding-start: 0;
+	margin: 0 auto;
+}
+
+.uploadify-queue .uploadify-queue-item .uploadify_tools  .uploadifytoollist li{
+	list-style: none;
+	float: left;
+	width: 47%;
+	text-align: center;
+	height: 16px;
+	background-size: 16px;
+	margin-top: 7px;
+}
+
+.uploadbtn {
+	background:
+		url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABNElEQVRYR+2X7U3DQAyGn3cCOgIbwAjtBoxQJmAE6AaMwAhsAGwAI7ABncDI1QVF+bRJKvXHWTrlj2M/99oXX0TAzOwaeAP8OWU/wE7SZyDsyUURRzN7Ah4jvsBBkvuHrAJUBaoCVYGqQE8BM7sFrjrf0T3gK2IvgK+2HcfmwxCAD5QuQCTxpI+kwXKPKfC+IsQRuJPkMXs2SFXKsAaEJ99OjefRU7ACxGzy2ftAuYi8AjfJJgglnwVwBzPbAF6OKEQ4eQggCZFKHgYIQnyXbg/fB1MAMxBfpdv9G5Ky0CxoRxzoiX8nTyvQgBSIZ8AbdC8pvfMmVlqBlL4B58sBMLOtH/sA9CIXSR/tACcFkn8+iwCAe0l/47oB8IZ6WBo5+H4foKjgJTi7dcfy5TTh2bc+kuAXBwWWIXKUKG0AAAAASUVORK5CYII=)
+		no-repeat center;
+}
+
+.previewtn {
+	background:
+		url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABD0lEQVQ4T7WTDU0DQRSEv1EAEpBAFcApoCigKAAHtA5wQKsAUEAdcBKKAnAwZJrdy3K0CcmFTS653Hvz7byfExOPJuo5CrB9DlyVC3bAq6Sv8YW/ALYvgSfgbJQc8aOkVfv9B8D2EngoCZsIgAjnQGInQA901c0AsL0Gboo4due24+JUUm87kOcSHyB7gO1FsV3ddUDqfg8AuJW0th03cZGzldRVQBtIcFaEbyV5JWlpewtcND0YAK29xK8lvdhOD1LGfenFZyPeSFq0PWjLiP1ZO7YCu6sNjjjv4ymMIWlsYHGYJ2d/c3VyaA9iOcK21uR/pJSUdnQP2kAZYbYxU+gzykNr/3//wl9/sskOvgFy1mRON8TsbwAAAABJRU5ErkJggg==)
+		no-repeat center;
+}
+
+.delfilebtn {
+	width: 24px;
+	height: 24px;
+	background:
+		url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACKUlEQVRYR8WX/TXEQBTFf1MBHaACqwJUgArYDmwFdEAHqAAVWBWgAqsDKohzdyYxSeZzd88x/yXzMu/Offd9xPDPy/yzf6oANDABToAjYBv7rPUOfANz4NnY56JVBKCBU+AG2C06FRbAzMBTzj4JoLEO79yNc2eF9sXI1FhAwRUF4Oh+cVSv4rz9RqE5joUlCMA5f1vHa+DbgxCIEQBHu5xLZJtcYkIgeuEIAVDcDjfp2TtrbuDYP7sHoIELJ7qY/x9gKwMuZ3PmZ8cQgOjZiTj4cNlwC5xHbB6AS1cP9iM2CwN77V4HICM8xW/P2GJDA/cBEA/GMqh96UeXibHVCdIHcA1cJei9NzBt9wcgOucJgP7RKlJi8q8UN7aM5sQXAqFDljcvdC6zV2PLeQ+A6ncsbj76Hgh/IxKaEKlBAE1F6o1AVDhfujHu8r4GagD0Yl5BfXfHEIDSEIycV8Y/qoESEYbU3iSyIxbVoAZyaZhKtVSKhkAE01DTTawDlhSiDoQrRJ+JhjYuRE5IqVIsjaiRpEqxKuQM0BzRjmtDBr6MN1kNe4FGr8dEOoqJXJvO2cSbkWOhRIwVJaNn2omvfRsbSER3ru3WglCbnmQHEsdCSpC1jlv7spHMKyoCoXCsy4RuflQ1lHogNJZL2bkuGS04wMVKY/mgyyk7lH6xaWmUapqM1v4xGZ7qpiaBWfZyj5lX96w/IQ2em/01W1V1Jd8V/RuWHLSqzS8h4Zwh9WaqWwAAAABJRU5ErkJggg==)
+		no-repeat center;
+	background-size: 24px;
+	position: absolute;
+	right: 2px;
+	top: -32px;
+	display: none;
+}
+
+.up_filename, .progressnum, .delfilebtn, .uploadbtn, .up_percent {
+	font-size: 12px;
+	color: #fff;
+	margin-left: 10px;
+}
+
+.up_filename {
+	position: absolute;
+	top: 50%;
+	left: 15%;
+	z-index: 9999;
+	display: none;
+}
+
+.up_percent {
+	position: absolute;
+	top: 40%;
+	left: 15%;
+	color: red;
+	z-index: 9999;
+	display: none;
+}
+
+.progressnum {
+	position: absolute;
+	top: 40%;
+	left: 32%;
+	color: red;
+	z-index: 9999;
+	display: none;
+}
+
+.uploadify-progress {
+	width: 80%;
+	height: 10px;
+	background-color: white;
+	border-radius: 20px;
+	border: 2px groove #666;
+	vertical-align: middle;
+	position: absolute;
+	left: 10%;
+	top: 40%;
+	z-index: 9999;
+	display: none;
+}
+
+.uploadify-progress-bar {
+	width: 0;
+	height: 100%;
+	border-radius: 20px;
+	background-color: #0099FF;
+}

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MemberMapper">
+
+    <!-- 主页页面从bl_member表中获取指定username字段 -->
+	<select id="userRegister" parameterType="pd" resultType="pd" useCache="false">
+	    SELECT USERNAME FROM bl_member where (USERNAME=#{username} ) and status=1;
+	</select>
+	 <!-- 主页页面从bl_member表中获取指定EMAIL字段 -->
+	<select id="userRegisteremail" parameterType="pd" resultType="pd" useCache="false">
+	    SELECT EMAIL FROM bl_member where (EMAIL=#{email} ) and status=1;
+	</select>
+	<!--  添加用户到bl_member中 -->
+	<insert id="saveUserRegister" parameterType="pd">
+		INSERT INTO BL_MEMBER(ID,USERNAME,PASSWORD,TEL,EMAIL,CREATETIME,roleId,reg_portal) VALUES(#{id},#{username},#{password},#{username},#{email},now(),0,0);
+	</insert>
+	
+	<!-- 修改用户数据 -->
+	<update id="modifyUserInfo" parameterType="pd">
+		UPDATE BL_MEMBER SET 
+		<if test="username != null">
+			USERNAME=#{username},
+		</if>
+		<if test="aliasname != null">
+			ALIASNAME=#{aliasname},
+		</if>
+		<if test="ip != null">
+			IP=#{ip},
+		</if>
+		<if test="sex != null  and  sex!='' ">
+			sex=#{sex},
+		</if>
+		<if test="industryId != null  and  industryId!='' ">
+			INDUSTRY=#{industryId},
+		</if>
+		<if test="educationId != null  and  educationId!='' ">
+			EDUCATION=#{educationId},
+		</if>
+		<if test="headicon != null  and  headicon !='' ">
+			HEADICON=#{headicon},
+		</if>
+		<if test="tel != null  and  tel !='' ">
+			TEL=#{tel},
+		</if>
+		<if test="email != null  and  email !='' ">
+			EMAIL=#{email},
+		</if>
+		CREATETIME=now() where id=#{id} and STATUS=1;
+	</update>
+	
+	<!-- 修改密码 -->
+	<update id="passwordModify" parameterType="pd">
+			update bl_member set PASSWORD=#{newPassword},LAST_PASSWORD=#{oldPassword} where ID=#{id}
+	</update>
+	
+	<!-- 获取当前密码 -->
+	<select id="passwordGet" parameterType="pd" resultType="pd" useCache="false">
+	    SELECT ID,PASSWORD FROM BL_MEMBER WHERE status=1 and ISDELETE='0'
+	     <if test="id != null and id !='' ">
+			and id=#{id}
+		</if>
+		 <if test="email != null and email !='' ">
+			and 
+			(EMAIL=#{email} or USERNAME=#{email} or TEL=#{email})
+		</if>
+	</select>
+	
+	<!-- 登录成功后返回的值 -->
+	<select id="getMemberInfo" parameterType="pd" resultType="pd" useCache="false">
+	 SELECT ID, USERNAME, EMAIL, `PASSWORD`, ALIASNAME, LAST_PASSWORD, IP, SEX,
+     INDUSTRY, (SELECT NAME FROM  sys_dictionaries WHERE ZD_ID = INDUSTRY) INDUSTRY_NAME, EDUCATION,
+    (SELECT NAME FROM  sys_dictionaries WHERE ZD_ID = EDUCATION) EDUCATION_NAME, HEADICON, TEL,EMAIL,CREATETIME, `STATUS`, ISDELETE ,ROLEID from bl_member where STATUS = 1 and ISDELETE='0'
+    <if test="id != null and id != '' ">
+        and id = #{id} 
+    </if>
+	</select>
+	
+	<!-- 添加邮箱记录 -->
+	<insert id="saveEmail" parameterType="pd">
+		insert into BL_EMAILVALIDATE(ID,EVCODE,EVTIME) 
+			values(#{id},#{evcode},now())
+	</insert>
+	
+	<!-- 查找邮箱记录 -->
+	<select id="queryEmailHistory" parameterType="pd" resultType="pd">
+		select ID,EVTIME from BL_EMAILVALIDATE where EVCODE = #{evcode}
+	</select>
+	
+	<!-- 激活用户 -->
+	<update id="activatedUser" parameterType="pd">
+		update bl_member set status = 1 where ID = #{id}
+	</update>
+	<!-- 判断用户是否存在 判断邮箱是否正确-->
+	<select id="queryUsername" parameterType="pd" resultType="pd">
+		select ID,USERNAME,ALIASNAME,PASSWORD,LAST_PASSWORD,IP,SEX,INDUSTRY,EDUCATION,HEADICON,TEL,EMAIL,STATUS,ISDELETE,CREATETIME from bl_member where USERNAME = #{username} 
+	</select>
+	<!-- 判断邮箱，和 手机是否绑定账号-->
+	<select id="queryUseremailandphone" parameterType="pd" resultType="pd">
+		select ID,USERNAME,ALIASNAME,PASSWORD,LAST_PASSWORD,IP,SEX,INDUSTRY,EDUCATION,HEADICON,TEL,EMAIL,STATUS,ISDELETE,CREATETIME from bl_member where TEL = #{username} or EMAIL = #{username}
+	</select>
+		<!-- 重置密码-->
+	<update id="updatapwd" parameterType="pd">
+		update bl_member set PASSWORD=#{czpwd} where ID=#{id}
+	</update>
+	<!-- 添加 支付记录 -->
+	<insert id="savepay" parameterType="pd">
+		insert into zr_zx_pay(id,order_no,amonut,remark,flag,userid,create_time) values(#{id},#{orderno},#{amonut},#{remark},#{flag},#{userid},now())
+	</insert>
+	<!-- 查询  支付记录 -->
+	<select id="querypayHistory" parameterType="pd" resultType="pd">
+		SELECT * FROM zr_zx_pay WHERE 1=1 AND userid=#{userid}
+		  <if test="startDay != null and startDay != '' ">
+		  	<![CDATA[ AND DATE_FORMAT(create_time,'%Y-%m-%d %h:%i:%s') >= #{startDay} ]]>
+		</if>
+		<if test="endDay != null and endDay != '' ">
+		   	<![CDATA[ AND DATE_FORMAT(create_time,'%Y-%m-%d %h:%i:%s') <= #{endDay} ]]>
+		</if>	
+	</select>
+</mapper>

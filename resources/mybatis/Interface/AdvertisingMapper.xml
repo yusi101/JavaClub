@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AdvertisingMapper">
+
+	
+	<select id="queryAdvertisingInfolistPage" parameterType="String" resultType="Map">
+	
+          SELECT  ADVERTID,
+          C_LEVEL,CATEGORY,
+          DATE_FORMAT(IDENTIFYDATE,'%Y-%m-%d') AS IDENTIFYDATE,
+          DATE_FORMAT(VALFORM,'%Y-%m-%d') AS VALFORM,
+          DATE_FORMAT(VALTO,'%Y-%m-%d') AS VALTO,
+          IDENTIFYORGANS,SOURCENAME,CONTENT
+          FROM ZR_LC_ADVERTINFO WHERE 1=1
+          <if test="pd.pripid != null and pd.pripid != ''">
+ 		   AND  PRIPID=#{pd.pripid}
+     	  </if>
+            
+	</select>
+    <select id="queryAdvertisingInfo" parameterType="String" resultType="Map">
+	
+          SELECT  ADVERTID,
+          C_LEVEL,CATEGORY,
+          DATE_FORMAT(IDENTIFYDATE,'%Y-%m-%d') AS IDENTIFYDATE,
+          DATE_FORMAT(VALFORM,'%Y-%m-%d') AS VALFORM,
+          DATE_FORMAT(VALTO,'%Y-%m-%d') AS VALTO,
+          IDENTIFYORGANS,SOURCENAME,CONTENT
+          FROM ZR_LC_ADVERTINFO WHERE 1=1
+          <if test="pripid != null and pripid != ''">
+ 		   AND  PRIPID=#{pripid}
+     	  </if>
+            
+	</select>
+</mapper>

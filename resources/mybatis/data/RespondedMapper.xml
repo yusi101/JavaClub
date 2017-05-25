@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="RespondedMapper">
+<!-- 管理员审核/回复 -->	
+	<!-- 插入管理员审核/回复 -->
+	<insert id="insertRespondedInfo" parameterType="pd">
+		INSERT INTO bl_responded (ID,RELATION_ID,TYPE_ID,CREATEUSER_ID,CREATETIME,RESULTREMARK)
+		VALUES (#{id},#{ID},#{typeId},#{memberId},NOW(),#{resultRemark})
+	</insert>
+	
+	<!-- 根据关联ID查询管理员回复 -->
+	<select id="queryRespondedInfoByRelationId" parameterType="pd" resultType="pd">	
+		SELECT (SELECT U.NAME FROM SYS_USER U WHERE U.USER_ID = R.CREATEUSER_ID ) RESULTNAME,TYPE_ID TYPE,RESULTREMARK,CREATETIME RESULTTIME FROM BL_RESPONDED R 
+			WHERE R.RELATION_ID=#{relationId}  ORDER BY R.CREATETIME DESC
+	</select>
+	
+	<!-- 根据关联ID删除管理员回复 -->
+	<delete id="deleteRespondedInfoByRelationId" parameterType="pd">	
+		DELETE FROM BL_RESPONDED WHERE RELATION_ID=#{relationId}
+	</delete>
+	
+</mapper>

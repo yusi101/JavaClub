@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ActiveMapper">
+
+<!-- 评论管理 --> 	
+	<!-- 查询评论 分页-->
+	<select id="queryCommentInfolistPage" parameterType="page" resultType="pd" useCache="false" >
+         SELECT C.ID COMMENTID,C.PRIPID,E.ENTNAME
+        	 ,M.ID MEMBERID, M.USERNAME MEMBERNAME,M.HEADICON,C.REMARK CONTENT,C.SUCCESSQTY,C.FAILEDQTY,C.CREATETIME
+         <if test="pd.pid == null or pd.pid == ''">
+			<if test="pd.memberId != null and pd.memberId != ''">         	
+					,(SELECT COUNT(*) FROM BL_PRAISE WHERE RELATION_ID=C.ID AND MEMBER_ID=#{pd.memberId} AND TYPE=0) ISSUCCESS
+         	 		,(SELECT COUNT(*) FROM BL_PRAISE WHERE RELATION_ID=C.ID AND MEMBER_ID=#{pd.memberId} AND TYPE=1) ISFAILED
+			</if>
+         	<if test="pd.memberId == null or pd.memberId == ''">
+				,0 ISSUCCESS
+         	 	,0 ISFAILED
+			</if> 
+          </if>
+         FROM BL_COMMENT C,BL_MEMBER M,BL_ENTERADDITIONINFO E WHERE E.PRIPID=C.PRIPID AND M.ID=C.MEMBER_ID AND M.ISDELETE='0'
+        <if test="pd.pid == null or pd.pid == ''">
+       		 AND C.PID ='0'  
+        </if>
+        <if test="pd.pid != null and pd.pid != ''">
+			AND C.PID=#{pd.pid}
+		</if>
+        <if test="pd.pripid != null and pd.pripid != ''">
+			AND C.PRIPID=#{pd.pripid}
+		</if>
+		<if test="pd.status != null and pd.status != ''">
+			AND C.STATUS=#{pd.status}
+		</if>
+		<if test="pd.memberId != null and pd.memberId != ''">
+			<if test="pd.pripid == null or pd.pripid == ''">
+				AND C.MEMBER_ID=#{pd.memberId}
+			</if>
+		</if>
+         ORDER BY C.CREATETIME DESC
+	</select>
+	
+	<!-- 查询评论  不分页-->
+	<select id="queryCommentInfo" parameterType="pd" resultType="pd" useCache="false" >
+         SELECT C.ID COMMENTID,C.PRIPID,E.ENTNAME
+        	 ,M.ID MEMBERID, M.USERNAME MEMBERNAME,M.HEADICON,C.REMARK CONTENT,C.SUCCESSQTY,C.FAILEDQTY,C.CREATETIME
+         <if test="pid == null or pid == ''">
+       		 <if test="memberId != null and memberId != ''">
+				,(SELECT COUNT(*) FROM BL_PRAISE WHERE RELATION_ID=C.ID AND MEMBER_ID=#{memberId} AND TYPE=0) ISSUCCESS
+        	 		,(SELECT COUNT(*) FROM BL_PRAISE WHERE RELATION_ID=C.ID AND MEMBER_ID=#{memberId} AND TYPE=1) ISFAILED
+			</if>
+         	<if test="memberId == null or memberId == ''">
+				,0 ISSUCCESS
+         	 	,0 ISFAILED
+			</if> 
+          </if>
+         FROM BL_COMMENT C,BL_MEMBER M,BL_ENTERADDITIONINFO E WHERE E.PRIPID=C.PRIPID AND M.ID=C.MEMBER_ID AND M.ISDELETE='0'
+        <if test="pid == null or pid == ''">
+       		 AND C.PID ='0'  
+        </if>
+        <if test="pid != null and pid != ''">
+			AND C.PID=#{pid}
+		</if>
+        <if test="pripid != null and pripid != ''">
+			AND C.PRIPID=#{pripid}
+		</if>
+		<if test="status != null and status != ''">
+			AND C.STATUS=#{status}
+		</if>
+		<if test="memberId != null and memberId != ''">
+			<if test="pripid == null or pripid == ''">
+				AND C.MEMBER_ID=#{memberId}
+			</if>
+		</if>
+         ORDER BY C.CREATETIME DESC
+	</select>
+	
+	
+	<!-- 保存评论点评 -->
+	<insert id="insertCommentInfo" parameterType="pd">
+          INSERT INTO BL_COMMENT(ID,PRIPID,PID,MEMBER_ID,REMARK,CREATETIME,STATUS,SUCCESSQTY,FAILEDQTY)
+          values(#{id},#{pripid},#{pid},#{memberId},#{remark},now(),0,0,0)
+	</insert>
+	
+<!-- 评论点赞 --> 	
+	<!-- 对点评进行点赞 -->
+	<insert id="savePraiseSuccessqty" parameterType="pd">
+          INSERT INTO BL_PRAISE(ID,MEMBER_ID,RELATION_ID,CREATETIME,TYPE)
+          values(#{id},#{memberId},#{commentId},now(),0)
+	</insert>
+	
+	<!-- 对点评进行点赞,改点评进行加一 -->
+	<update id="addSuccessqty" parameterType="pd">
+         UPDATE BL_COMMENT SET SUCCESSQTY=SUCCESSQTY+1 WHERE ID=#{commentId}
+	</update>
+	
+	<!-- 对点评进行取消点赞 -->
+	<delete id="cancelPraiseSuccessqty" parameterType="pd">
+	      DELETE FROM BL_PRAISE WHERE MEMBER_ID=#{memberId} AND RELATION_ID=#{commentId} AND TYPE='0'
+	</delete>
+	<!-- 对点评进行点赞,改点评进行减一 -->
+	<update id="cancelSuccessqty" parameterType="pd">
+         UPDATE BL_COMMENT SET SUCCESSQTY=SUCCESSQTY-1 WHERE ID=#{commentId}
+	</update>
+   
+<!-- 评论吐槽 -->   
+    <!-- 对点评进行吐槽 -->
+	<insert id="savePraiseFailedqty" parameterType="pd">
+          INSERT INTO BL_PRAISE(ID,MEMBER_ID,RELATION_ID,CREATETIME,TYPE)
+          VALUES(#{id},#{memberId},#{commentId},now(),1)
+	</insert>
+	
+	<!-- 对点评进行吐槽点赞,改点评进行加一 -->
+	<update id="addFailedqty" parameterType="pd">
+         UPDATE BL_COMMENT SET FAILEDQTY=FAILEDQTY+1 WHERE ID=#{commentId}
+	</update>
+	
+	<!-- 对点评进行吐槽取消吐槽 -->
+	<delete id="cancelPraiseFailedqty" parameterType="pd">
+	      DELETE FROM BL_PRAISE WHERE MEMBER_ID=#{memberId} AND RELATION_ID=#{commentId} AND TYPE=1
+	</delete>
+	
+	<!-- 对点评进行点赞,改点评进行减一 -->
+	<update id="cancelFailedqty" parameterType="pd">
+         UPDATE BL_COMMENT SET FAILEDQTY=FAILEDQTY-1 WHERE ID=#{commentId}
+	</update>	
+	
+<!-- 关注管理 -->	
+
+	<!-- 用户对企业进行关注，方便查阅 -->
+	<insert id="insertFollowInfo" parameterType="pd">
+          INSERT INTO BL_FOLLOW(ID,PRIPID,MEMBER_ID,STATUS,CREATETIME)
+          VALUES(#{id},#{pripid},#{memberId},0,now())
+	</insert>
+	
+
+	<!-- 用户对企业取消关注 -->
+	<delete id="cancelFollowInfo" parameterType="pd">
+	      UPDATE BL_FOLLOW SET STATUS =1 WHERE PRIPID=#{pripid} and MEMBER_ID=#{memberId};
+	      <!-- DELETE FROM  BL_FOLLOW WHERE PRIPID=#{pripid} and MEMBER_ID=#{memberId}; -->
+	</delete>
+	
+	<!-- 查看我的关注列表  分页-->
+	<select id="queryFollowInfolistPage" parameterType="page" resultType="pd" useCache="false" >
+         SELECT F.ID,E.ENTNAME,E.PRIPID,E.REGNORE,E.UNISCID,E.NAME NAME,E.ENTTYPE,F.MEMBER_ID,F.STATUS,F.CREATETIME
+        	 FROM BL_FOLLOW F,BL_ENTERADDITIONINFO E
+             WHERE F.STATUS =0 AND E.PRIPID=F.PRIPID 
+         <if test="pd.memberId != null and pd.memberId != ''">
+			AND F.MEMBER_ID=#{pd.memberId}
+		</if>
+		<if test="pd.pripid != null and pd.pripid != ''">
+			AND F.PRIPID=#{pd.pripid}
+		</if>
+        GROUP BY F.MEMBER_ID,E.PRIPID ORDER BY F.CREATETIME DESC
+	</select>	
+	<!-- 查看关注列表 不 分页-->
+	<select id="queryFollowInfo" parameterType="page" resultType="pd" useCache="false" >
+         SELECT F.ID,E.ENTNAME,E.PRIPID,E.REGNORE,E.UNISCID,E.NAME NAME,E.ENTTYPE,E.REGCAP,E.REGCAPCUR_CN,F.MEMBER_ID,F.STATUS,F.CREATETIME
+        	 FROM BL_FOLLOW F,BL_ENTERADDITIONINFO E
+           	 WHERE F.STATUS =0 AND E.PRIPID=F.PRIPID  
+         <if test="memberId != null and memberId != ''">
+			AND F.MEMBER_ID=#{memberId}
+		</if>
+		<if test="pripid != null and pripid != ''">
+			AND F.PRIPID=#{pripid}
+		</if>
+         GROUP BY F.MEMBER_ID,E.PRIPID ORDER BY F.CREATETIME DESC
+	</select>
+	
+	
+<!-- 投诉管理 -->	
+	
+	<!-- 用户对企业进行投诉 -->
+	<insert id="insertComplainInfo" parameterType="pd">
+          INSERT INTO BL_COMPLAINT(ID, PRIPID, TYPE_ID, TITLE, MEMBER_ID, REMARK, CREATETIME)
+          VALUES(#{id},#{pripid},#{typeId},#{title},#{memberId},#{remark},now())
+	</insert>
+	
+	
+	<!-- 取消用户对企业的投诉信息 -->
+	<delete id="cancelComplainInfo" parameterType="pd">
+	      delete from bl_complaint where id=#{id}
+	</delete>
+	
+	<!-- 查看投诉列表  不分页-->
+	<select id="queryComplaintInfo" parameterType="pd" resultType="pd" useCache="false" >
+         SELECT C.ID, E.ENTNAME, C.PRIPID, E.REGNORE, E.UNISCID, (SELECT NAME  FROM SYS_DICTIONARIES D WHERE D.ZD_ID=C.TYPE_ID) TYPE_NAME,
+         	C.TITLE, C.MEMBER_ID, C.REMARK, C.CREATETIME,CASE WHEN C.STATUS=0 THEN '审核中' WHEN C.STATUS=1 THEN '审核通过' WHEN C.STATUS=2 THEN '审核失败' END  STATUS_NAME
+        <if test="id != null and id != ''">
+			,R.CREATETIME RESPONDEDTIME,R.CREATEUSER_NAME,R.RESULTREMARK      	 
+ 			FROM BL_ENTERADDITIONINFO E, BL_COMPLAINT C LEFT JOIN bl_responded R ON R.RELATION_ID=C.ID
+		</if>
+        <if test="id == null or id == ''">
+        	FROM BL_COMPLAINT C,BL_ENTERADDITIONINFO E
+        </if>
+             WHERE C.PRIPID=E.PRIPID  
+		<if test="memberId != null and memberId != ''">
+			<if test="pripid == null or pripid == ''">
+				AND C.MEMBER_ID=#{memberId}
+			</if>
+		</if>
+		<if test="pripid != null and pripid != ''">
+			AND C.PRIPID=#{pripid}
+		</if>
+		<if test="status != null and status != ''">
+			AND C.STATUS=#{status}
+		</if>
+		<if test="id != null and id != ''">
+			AND C.ID=#{id}
+		</if>
+         ORDER BY C.CREATETIME DESC
+	</select>
+	
+	<!-- 查看投诉列表   分页-->
+	<select id="queryComplaintInfolistPage" parameterType="page" resultType="pd" useCache="false" >
+         SELECT C.ID, E.ENTNAME, C.PRIPID, E.REGNORE, E.UNISCID, (SELECT NAME  FROM SYS_DICTIONARIES D WHERE D.ZD_ID=C.TYPE_ID) TYPE_NAME,
+         	C.TITLE, C.MEMBER_ID, C.REMARK, C.CREATETIME,CASE WHEN C.STATUS=0 THEN '审核中' WHEN C.STATUS=1 THEN '审核通过' WHEN C.STATUS=2 THEN '审核失败' END  STATUS_NAME
+        <if test="pd.id != null and pd.id != ''">
+			,R.CREATETIME RESPONDEDTIME,R.CREATEUSER_NAME,R.RESULTREMARK      	 
+ 			FROM BL_ENTERADDITIONINFO E, BL_COMPLAINT C LEFT JOIN bl_responded R ON R.RELATION_ID=C.ID
+		</if>
+        <if test="pd.id == null or pd.id == ''">
+        	FROM BL_COMPLAINT C,BL_ENTERADDITIONINFO E
+        </if>	
+             WHERE C.PRIPID=E.PRIPID  
+        <if test="pd.memberId != null and pd.memberId != ''">
+			<if test="pd.pripid == null or pd.pripid == ''">
+				AND C.MEMBER_ID=#{pd.memberId}
+			</if>
+		</if>
+		<if test="pd.pripid != null and pd.pripid != ''">
+			AND C.PRIPID=#{pd.pripid}
+		</if>
+		<if test="pd.status != null and pd.status != ''">
+			AND C.STATUS=#{pd.status}
+		</if>
+		<if test="pd.id != null and pd.id != ''">
+			AND C.ID=#{pd.id}
+		</if>
+         ORDER BY C.CREATETIME DESC
+	</select>
+	
+	<!-- 上传附件 -->
+	<insert id="insertAttachment" parameterType="pd">
+          INSERT INTO BL_ATTACHMENT(ATTACHMENT_ID, RELATION_ID, ATTACHMENT_NAME,ATTACHMENT_PATH, ATTACHMENT_TYPE, ATTACHMENT_DESCRIPTION, ATTACHMENT_CREATETIME, ATTACHMENT_CREATEUSER)
+          VALUES(#{attachmentId},#{relationId},#{attachmentName},#{attachmentPath},#{type},#{description},now(),#{memberId})
+	</insert>
+	
+	<!-- 删除附件信息 -->
+	<delete id="deleteAttachment" parameterType="pd">
+	   DELETE FROM BL_ATTACHMENT WHERE 1=1
+	   <if test="type != null and type != ''">
+			AND ATTACHMENT_TYPE = #{type}
+		</if>
+		<if test="relationId != null and relationId != ''">
+			AND RELATION_ID = #{relationId}
+		</if>
+	   <if test="attachmentId != null and attachmentId != ''">
+			AND ATTACHMENT_ID = #{attachmentId}
+		</if>
+		<if test="memberId != null and memberId != ''">
+			AND ATTACHMENT_CREATEUSER = #{memberId}
+		</if>
+	</delete>
+	
+	
+	<!-- 获得附件 信息-->
+	<select id="queryAttachmentInfo" parameterType="pd" resultType="pd" useCache="false" >
+         SELECT ATTACHMENT_ID, RELATION_ID, ATTACHMENT_NAME,ATTACHMENT_PATH, ATTACHMENT_TYPE, ATTACHMENT_DESCRIPTION, ATTACHMENT_CREATETIME, ATTACHMENT_CREATEUSER
+         FROM BL_ATTACHMENT WHERE 1=1
+        <if test="type != null and type != ''">
+			AND ATTACHMENT_TYPE = #{type}
+		</if>
+		<if test="relationId != null and relationId != ''">
+			AND RELATION_ID = #{relationId}
+		</if>
+	   <if test="attachmentId != null and attachmentId != ''">
+			AND ATTACHMENT_ID = #{attachmentId}
+		</if>
+		<if test="memberId != null and memberId != ''">
+			AND ATTACHMENT_CREATEUSER = #{memberId}
+		</if>
+          ORDER BY ATTACHMENT_CREATETIME DESC
+	</select>
+	
+	
+	
+	<!-- 查看认领列表信息 -->
+	<select id="queryClaimInfolistPage" parameterType="page" resultType="pd" useCache="false">
+       SELECT M.ID MEMBERID,C.ID CLAIMID,E.REGCAP,E.ENTNAME,E.ENTTYPE_CN,E.PRIPID,E.ENTTYPE,E.REGNORE,E.`NAME`,E.REGSTATE_CN,DATE_FORMAT(E.ESTDATE, '%Y-%m-%d') ESTDATE,
+       DATE_FORMAT(C.CREATETIME, '%Y-%m-%d') CLAIMTIME,
+			M.USERNAME USERNAME,M.ALIASNAME ALIASNAME,C.EMAIL,C.TEL,
+			C.STATUS,CASE WHEN C.STATUS=0 THEN '审核中' WHEN C.STATUS=1 THEN '审核通过' WHEN C.STATUS=2 THEN '审核失败' END  STATUSNAME,
+			C.REMARK
+			<if test="pd.claimId != null and pd.claimId != ''">
+				,R.RESULTREMARK,R.CREATETIME RESULTTIME,R.CREATEUSER_NAME RESULTUSER
+			</if>
+		FROM BL_MEMBER M, BL_ENTERADDITIONINFO E,BL_CLAIM C 
+			<if test="pd.claimId != null and pd.claimId != ''">
+				LEFT JOIN BL_RESPONDED R ON R.RELATION_ID=C.ID
+			</if>
+		WHERE E.PRIPID=C.PRIPID AND M.ID=C.MEMBER_ID
+		<if test="pd.memberId != null and pd.memberId != ''">
+			AND C.MEMBER_ID=#{pd.memberId}
+		</if>
+		<if test="pd.claimId != null and pd.claimId != ''">
+			AND C.ID=#{pd.claimId}
+		</if>
+		<if test="pd.status != null and pd.status != ''">
+			AND C.STATUS=#{pd.status}
+		</if>
+		ORDER BY C.CREATETIME DESC
+	</select>
+	
+	<!-- 查看认领列表信息 -->
+	<select id="queryClaimInfo" parameterType="pd" resultType="pd" useCache="false">
+       SELECT M.ID MEMBERID,C.ID CLAIMID,E.REGCAP,E.ENTNAME,E.ENTTYPE_CN,E.PRIPID,E.ENTTYPE,E.REGNORE,E.`NAME`,E.REGSTATE_CN,DATE_FORMAT(E.ESTDATE, '%Y-%m-%d') ESTDATE,
+       DATE_FORMAT(C.CREATETIME, '%Y-%m-%d') CLAIMTIME,
+			M.USERNAME USERNAME,M.ALIASNAME ALIASNAME,C.EMAIL,C.TEL,
+			C.STATUS,CASE WHEN C.STATUS=0 THEN '审核中' WHEN C.STATUS=1 THEN '审核通过' WHEN C.STATUS=2 THEN '审核失败' END  STATUSNAME,
+			C.REMARK
+			<if test="claimId != null and claimId != ''">
+				,R.RESULTREMARK,R.CREATETIME RESULTTIME,R.CREATEUSER_NAME RESULTUSER
+			</if>
+		FROM BL_MEMBER M, BL_ENTERADDITIONINFO E,BL_CLAIM C 
+			<if test="claimId != null and claimId != ''">
+				LEFT JOIN BL_RESPONDED R ON R.RELATION_ID=C.ID
+			</if>
+		WHERE E.PRIPID=C.PRIPID AND M.ID=C.MEMBER_ID
+		<if test="memberId != null and memberId != ''">
+			AND C.MEMBER_ID=#{memberId}
+		</if>
+		<if test="claimId != null and claimId != ''">
+			AND C.ID=#{claimId} 
+		</if>
+		<if test="status != null and status != ''">
+			AND C.STATUS=#{status}
+		</if>
+		ORDER BY C.CREATETIME DESC
+	</select>
+	
+	
+	<!-- 增加认领企业 -->
+	<insert id="insertClaimInfo" parameterType="pd">
+          INSERT INTO BL_CLAIM (ID, PRIPID, MEMBER_ID, EMAIL, TEL, REMARK, CREATETIME)
+          VALUES(#{id},#{pripid},#{memberId},#{email},#{tel},#{remark},now())
+	</insert>
+	
+	<!-- 修改企业认领 -->
+	<update id="updateClaimInfo" parameterType="pd">
+	UPDATE BL_CLAIM SET
+	   <if test="memberId != null and memberId != ''">
+		   MEMBER_ID=#{memberId},
+	   </if>
+	   <if test="pripid != null and pripid != ''">
+		   PRIPID=#{pripid},
+	   </if>
+	   <if test="remark != null">
+		   REMARK=#{remark},
+	   </if>
+	   <if test="email != null">
+		   email=#{email},
+	   </if>
+	   <if test="tel != null">
+		   TEL=#{tel},
+	   </if>
+		   CREATETIME=now() , STATUS=0 WHERE ID=#{id}
+	 </update>
+	 
+	 <!-- 删除企业 认领-->
+	<delete id="deleteClaimInfo" parameterType="pd">
+          DELETE FROM BL_CLAIM where id=#{claimId}
+	</delete>
+	
+	<!-- 认领企业 -->
+	<delete id="deleteClaimUserInfo" parameterType="pd">
+          DELETE FROM SYS_USER where MEMBER_ID =#{memberId} and PRIPID=#{pripid}
+	</delete>
+	
+	<!-- 保存用户反馈 -->
+	<insert id="saveOpinion" parameterType="pd">
+          INSERT INTO BL_OPINION(ID,MEMBER_ID,THEME,TEL,EMAIL,REMARK,CREATETIME)
+          VALUEs(#{id},#{memberId},#{theme},#{tel},#{email},#{description},now())
+	</insert>
+</mapper>

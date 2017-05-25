@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AnnualNotificationMapper">
+
+	<!-- 查询没有过填写年报的企业和没有推送过填写年报的企业 -->
+	<select id="queryAnnualNotificationlistPage" parameterType="page" resultType="pd">
+		select eb.PRIPID,eb.ENTNAME,eb.TEL,eb.EMAIL 
+			from (select e.pripid,e.entname,an.tel,an.email 
+				from e_baseinfo e 
+				left join an_baseinfo an on e.pripid = an.pripid  
+				where C_COUNTY = '360122') eb 
+			where not exists (select pripid from an_baseinfo an 
+				where eb.pripid = an.pripid 
+				and an.ANCHEYEAR = extract(year from curdate()) 
+				union all 
+				select pripid from zr_anbaseinfo_rec zr where eb.pripid = zr.pripid) 
+			and eb.tel is not null and eb.email is not null
+	</select>
+	
+	<!-- 查询年报推送历史 -->
+	<select id="annualHistorylistPage" parameterType="page" resultType="pd">
+		select * from zr_anbaseinfo_rec where 1 = 1
+		<if test="pd.entname != null and pd.entname != ''">
+			and ENTNAME LIKE CONCAT(CONCAT('%', #{pd.entname}),'%') 
+		</if>
+		<if test="pd.startTime != null and pd.startTime != ''">
+			and CURIMESTAMP &gt;= #{pd.startTime}
+		</if>
+		<if test="pd.endTime != null and pd.endTime != ''">
+			and CURIMESTAMP &lt;= date_add(#{pd.endTime}, interval 1 day)
+		</if>
+		order by CURIMESTAMP desc
+	</select>
+	
+	<!-- 添加年报邮件推送记录 -->
+	<insert id="insertAnnualNotification" parameterType="pd">
+		insert into zr_anbaseinfo_rec (ID,PRIPID,ENTNAME,USER_ID,EMAIL_FLAG,TEL_FLAG)
+			values (#{aid},#{pripid},#{entname},#{uid},#{email},#{tel})
+	</insert>
+	
+	<!-- 查询没有过填写年报的企业和没有推送过填写年报的企业  不分页 -->
+	<select id="queryAnnualNotificationlist" parameterType="page" resultType="pd">
+		select eb.PRIPID,eb.ENTNAME,eb.TEL,eb.EMAIL 
+			from (select e.pripid,e.entname,an.tel,an.email 
+				from e_baseinfo e 
+				left join an_baseinfo an on e.pripid = an.pripid  
+				where C_COUNTY = '360122') eb 
+			where not exists (select pripid from an_baseinfo an 
+				where eb.pripid = an.pripid 
+				and an.ANCHEYEAR = extract(year from curdate()) 
+				union all 
+				select pripid from zr_anbaseinfo_rec zr where eb.pripid = zr.pripid) 
+			and eb.tel is not null and eb.email is not null
+	</select>
+	
+	<!-- 查询年报推送历史  不分页-->
+	<select id="annualHistorylist" parameterType="page" resultType="pd">
+		select * from zr_anbaseinfo_rec where 1 = 1
+		<if test="pd.entname != null and pd.entname != ''">
+			and ENTNAME LIKE CONCAT(CONCAT('%', #{pd.entname}),'%') 
+		</if>
+		<if test="pd.startTime != null and pd.startTime != ''">
+			and CURIMESTAMP &gt;= #{pd.startTime}
+		</if>
+		<if test="pd.endTime != null and pd.endTime != ''">
+			and CURIMESTAMP &lt;= date_add(#{pd.endTime}, interval 1 day)
+		</if>
+		order by CURIMESTAMP desc
+	</select>
+	<!-- 获取短信发送企业数据 -->
+	<select id="selectsmsinfo" parameterType="page" resultType="pd">
+		select PRIPID,ENTNAME,NAME,PHONE from zr_sms_baseinfo
+	</select>
+	<!-- 添加年报短信推送记录 -->
+	<insert id="insertsmshistory" parameterType="pd">
+		insert into zr_sms_history (ID,PRIPID,ENTNAME,NAME,PHONE,RESULTS,CREATETIME)
+			values (#{sid},#{pripid},#{entname},#{name},#{phone},#{results},now())
+	</insert>
+</mapper>

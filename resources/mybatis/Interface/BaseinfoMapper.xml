@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BaseinfoMapper">
+
+	<!-- 根据商标查询企业信息 -->
+	<select id="queryEnterpriseByBrandNamelistPage" parameterType="page"
+		resultType="pd" useCache="false">
+		SELECT
+		E.PRIPID,
+		DATE_FORMAT(E.ESTDATE, '%Y-%m-%d') ESTDATE,
+		E.ENTNAME,
+		E. NAME,
+		E.REGNO,
+		E.REGSTATE_CN,
+		E.UNISCID,
+		E.REGCAP,
+		E.ENTTYPE_CN,
+		REGCAPCUR_CN,
+		B.BRANDNAME,
+		E.REGORG_CN
+		FROM
+		E_BASEINFO E,
+		ZR_LC_BRAND B
+		WHERE
+		E.PRIPID = B.PRIPID
+		<if test="pd.industryCode != null and pd.industryCode != ''  ">
+			and E.INDUSTRYPHY = #{pd.industryCode}
+		</if>
+		<if test="pd.provinceCode != null and pd.provinceCode != '' ">
+			and E.C_PROVINCE like #{pd.provinceCode}||'%'
+		</if>
+		<if test="pd.cityCode != null and pd.cityCode != ''">
+			and E.C_CITY = #{pd.cityCode}
+		</if>
+		<if test="pd.searchKey != null and pd.searchKey != ''  ">
+			and B.BRANDNAME =#{pd.searchKey}
+		</if>
+		GROUP BY E.PRIPID
+	</select>
+
+	<!-- 根据失信人查询企业信息 -->
+	<select id="queryEnterpriseByCourtcaselistPage" parameterType="page"
+		resultType="pd" useCache="false">
+		SELECT
+		E.PRIPID,
+		DATE_FORMAT(E.ESTDATE, '%Y-%m-%d') ESTDATE,
+		E.ENTNAME,
+		E. NAME,
+		E.REGNO,
+		E.REGSTATE_CN,
+		E.UNISCID,
+		E.REGCAP,
+		E.ENTTYPE_CN,
+		REGCAPCUR_CN,
+		C.INAME,
+		C.BUESINESSENTITY,
+		E.REGORG_CN
+		FROM
+		E_BASEINFO E,
+		ZR_COURTCASEINFO C
+		WHERE
+		E.PRIPID = C.PRIPID
+		<if test="pd.industryCode != null and pd.industryCode != ''  ">
+			and E.INDUSTRYPHY = #{pd.industryCode}
+		</if>
+		<if test="pd.province != null and pd.province != '' ">
+			and E.C_PROVINCE like #{pd.province}||'%'
+		</if>
+		<if test="pd.cityCode != null and pd.cityCode != ''">
+			and E.C_CITY = #{pd.cityCode}
+		</if>
+		<if test="pd.searchKey != null and pd.searchKey != ''  ">
+			and (C.INAME =#{pd.searchKey} or
+			c.BUESINESSENTITY=#{pd.searchKey})
+		</if>
+		GROUP BY E.PRIPID
+	</select>
+
+	<!-- 根据企业名查询 新企业  信息 -->
+	<select id="queryEnterpriseByNewlistPage" parameterType="page"
+		resultType="pd" useCache="false">
+		SELECT * FROM zr_qydjxx Q WHERE 1=1 
+		<if test="pd.searchKey != null and pd.searchKey != ''  ">
+			and Q.ENTNAME =#{pd.searchKey}
+		</if>
+	</select>
+
+	<!-- 根据企业名查询 企业  信息 -->
+	<select id="queryEnterpriseEntNamelistPage" parameterType="page"
+		resultType="pd" useCache="false">
+		SELECT * FROM e_baseinfo Q WHERE 1=1 
+		<if test="pd.searchKey != null and pd.searchKey != ''  ">
+			and Q.ENTNAME =#{pd.searchKey}
+		</if>
+	</select>
+	<!-- 根据法人名查询 企业  信息 -->
+	<select id="queryEnterpriseNamelistPage" parameterType="page"
+		resultType="pd" useCache="false">
+		SELECT * FROM e_baseinfo Q WHERE 1=1 
+		<if test="pd.searchKey != null and pd.searchKey != ''  ">
+			and Q.NAME =#{pd.searchKey}
+		</if>
+	</select>
+	<select id="getindustry" resultType="Map" useCache="false">
+
+		select
+		EC_VALUE,EC_NAME from ZR_SYS_CODE t where EC_CODE='CA05'
+
+	</select>
+
+	<!-- 得到所有省市信息 -->
+	<select id="getAreaInfo" resultType="Map" useCache="false">
+
+		select
+		c_code,c_name,c_area_level from zr_sys_area order by c_code
+
+	</select>
+
+	<select id="getcityjx" resultType="Map" useCache="false">
+
+		select
+		c_code,c_name from zr_sys_area where c_code ='36' and
+		c_area_level='1'
+		order by c_code
+
+	</select>
+	<select id="getcityhn" resultType="Map" useCache="false">
+
+		select
+		c_code,c_name from zr_sys_area where c_code ='41' and
+		c_area_level='1'
+		order by c_code
+
+	</select>
+	<select id="getcitycodejx" resultType="Map" useCache="false">
+
+		select
+		c_code,c_name from zr_sys_area where c_code like '36%' and
+		c_area_level='2' order by c_code
+
+	</select>
+	<select id="getcitycodehn" resultType="Map" useCache="false">
+
+		select
+		c_code,c_name from zr_sys_area where c_code like '41%' and
+		c_area_level='2' order by c_code
+
+	</select>
+
+	<resultMap type="Map" id="count">
+		<result column="REGCAP" property="REGCAP" javaType="double" jdbcType="FLOAT" />  
+	</resultMap>
+	<select id="queryAllCountForEnterprise" resultMap="count,count" useCache="false" statementType="CALLABLE" parameterType="pd">
+		CALL SP_GetAllCountForEnterprise(#{pripid},#{memberId})
+	</select>
+<select id="queryEnterprise" parameterType="page"
+		resultType="pd" useCache="false">
+		SELECT * FROM zr_qydjxx Q WHERE Q.PRIPID = #{pd.pripid};
+	</select>
+	<!-- 插入日志 -->
+	<insert id="saveOperationLog" parameterType="pd">
+		INSERT INTO
+		SYS_LOG_OPERATION(LOGID, MEMBER_ID, PRIPID,REGNORE, ENTTYPE,
+		ENTNAME,
+		MODULENAME, LOGTIME,REMARK)
+		VALUES(#{logid},#{memberId},#{pripid},#{regnore},#{enttype},#{entname},#{modulename},now(),#{remark})
+	</insert>
+
+	<!-- 插入关键词搜索 -->
+	<insert id="saveKeywordLog" parameterType="pd">
+		INSERT INTO
+		SYS_LOG_KEYWORD(LOGID, MEMBER_ID,LOGTYPE,KEYWORDS,LOGTIME, REMARK)
+		VALUES(#{LogID},#{memberId},#{logType},#{searchKey},now(),#{remark})
+	</insert>
+	<select id="getgradename" resultType="Map" useCache="false">
+		select GRADENAME from TBL_ENTERPRISEINFO WHERE PRIPID=#{pripid}
+	</select>
+</mapper>

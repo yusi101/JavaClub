@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BrandMapper2">
+<!-- 新的商标查询 -->
+	<!-- 获取商标信息 	 -->
+	<select id="queryBrandInfolistPage" parameterType="page" resultType="pd">
+     SELECT B.TMID as ID,B.PRIPID,
+      B.REGNO,B.UNISCID,B.ENTNAME,B.REG_NUM as REGCORE,B.INT_CLS as CLASSIFYID,(SELECT CLASSNAME FROM
+		ZR_LC_BRANDCLASS WHERE ID=B.INT_CLS) CLASSNAME,B.COOWNER_CN_NAME as APPLICANT,
+     date_format(B.REG_ANNC_DATE,'%Y年%c月%d日') as APPLICATIONDATE,concat(date_format(B.PROPERTY_BGN_DATE,'%Y/%m/%d'),' - ',date_format(B.PROPERTY_END_DATE,'%Y/%m/%d')) as LIFESPAN,B.GOODS_CN_NAME as BRANDLIST,B.S_EXT_FROMNODE as AGENCY,B.TM_IMAGE as BRANDIMG
+     FROM tm_baseinfo B 
+     WHERE 1=1 
+     <if test="pd.pripid != null and pd.pripid != ''">
+      AND B.PRIPID=#{pd.pripid}
+     </if>
+      <if test="pd.brandName != null and pd.brandName != ''">
+      AND  B.REG_NUM = #{pd.brandName}
+     </if> 
+<!--      <if test="pd.brandStauts != null and pd.brandStauts != ''">
+      AND  B.BRANDSTAUTS = #{pd.brandStauts}
+     </if> 去除-->
+     <if test="pd.classifyId != null and pd.classifyId != ''">
+      AND  B.INT_CLS = #{pd.classifyId}
+     </if>
+     <if test="pd.brandId != null and pd.brandId != ''">
+      AND  B.TMID = #{pd.brandId}
+     </if>
+     </select>
+     
+     
+    <!-- 获取商标信息 	 -->
+	<select id="queryBrandInfo" parameterType="pd" resultType="pd">
+        SELECT B.TMID as ID,B.PRIPID,
+      B.REGNO,B.UNISCID,B.ENTNAME,B.REG_NUM as REGCORE,B.INT_CLS as CLASSIFYID,(SELECT CLASSNAME FROM
+		ZR_LC_BRANDCLASS WHERE ID=B.INT_CLS) CLASSNAME,B.COOWNER_CN_NAME as APPLICANT,
+     date_format(B.REG_ANNC_DATE,'%Y年%c月%d日') as APPLICATIONDATE,concat(date_format(B.PROPERTY_BGN_DATE,'%Y年%m月%d日'),' - ',date_format(B.PROPERTY_END_DATE,'%Y年%m月%d日')) as LIFESPAN,B.GOODS_CN_NAME as BRANDLIST,B.S_EXT_FROMNODE as AGENCY,B.TM_IMAGE as BRANDIMG
+     FROM tm_baseinfo B 
+     WHERE 1=1 
+     <if test="pripid != null and pripid != ''">
+      AND  B.PRIPID=#{pripid}
+     </if>
+      <if test="brandName != null and brandName != ''">
+      AND   B.REG_NUM = #{brandName}
+     </if>
+    <!--  <if test="brandStauts != null and brandStauts != ''">
+      AND  B.BRANDSTAUTS = #{brandStauts}
+     </if> 去除-->
+     <if test="classifyId != null and classifyId != ''">
+      AND  B.INT_CLS = #{classifyId}
+     </if>
+     <if test="brandId != null and brandId != ''">
+      AND   B.TMID = #{brandId}
+     </if> 
+	</select>
+	<!-- 获取商标信息 	 -->
+	<select id="queryBrandInfolimit" parameterType="pd" resultType="pd"  useCache="false">
+         SELECT B.TMID as ID,B.PRIPID,
+      B.REGNO,B.UNISCID,B.ENTNAME,B.REG_NUM as REGCORE,B.INT_CLS as CLASSIFYID,(SELECT CLASSNAME FROM
+		ZR_LC_BRANDCLASS WHERE ID=B.INT_CLS) CLASSNAME,B.COOWNER_CN_NAME as APPLICANT,
+     date_format(B.REG_ANNC_DATE,'%Y年%c月%d日') as APPLICATIONDATE,concat(date_format(B.PROPERTY_BGN_DATE,'%Y/%m/%d'),' - ',date_format(B.PROPERTY_END_DATE,'%Y/%m/%d')) as LIFESPAN,B.GOODS_CN_NAME as BRANDLIST,B.S_EXT_FROMNODE as AGENCY,B.TM_IMAGE as BRANDIMG
+     FROM tm_baseinfo B 
+     WHERE 1=1 
+     </select>
+    <!-- 商标类别 -->
+	<select id="queryBrandclassInfo" parameterType="pd" resultType="pd">
+		SELECT * FROM ZR_LC_BRANDCLASS WHERE 1=1
+		<if test="ID != null and ID != ''">
+			AND ID = #{ID}
+		</if>
+		<if test="className != null and className != ''">
+			AND CLASSNAME = #{className}
+		</if>
+	</select>
+</mapper>

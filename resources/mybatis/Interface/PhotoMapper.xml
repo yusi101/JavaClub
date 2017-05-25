@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PhotoMapper">
+
+	
+	<!-- 查找对应的轮播图片-->
+   <select id="queryPhotoInfolistPage"  useCache="false" resultType="pd" parameterType="page">
+		 SELECT A.ATTACHMENT_ID,A.ATTACHMENT_NAME,A.ATTACHMENT_PATH,A.ATTACHMENT_TYPE,A.ATTACHMENT_DESCRIPTION,A.ATTACHMENT_CREATETIME,
+		 A.ATTACHMENT_CREATEUSER FROM BL_ATTACHMENT A WHERE A.ATTACHMENT_TYPE='轮播图片' 
+		 <if test="pd.ID != null and pd.ID != ''">
+	    	AND A.ATTACHMENT_ID=#{pd.ID}
+	     </if>
+	     <if test="pd.attachMent_Name != null and pd.attachMent_Name != ''">
+	    	AND A.ATTACHMENT_NAME=#{pd.attachMent_Name}
+	     </if>
+	     <if test="pd.attachMent_CreateTime != null and pd.attachMent_CreateTime != ''">
+	    	AND A.ATTACHMENT_CREATETIME=#{pd.attachMent_CreateTime}
+	     </if>
+	     <if test="pd.attachMent_CreateUser != null and pd.attachMent_CreateUser != ''">
+	    	AND A.ATTACHMENT_CREATEUSER=#{pd.attachMent_CreateUser}
+	     </if>
+		 ORDER BY A.ATTACHMENT_NAME  DESC
+	</select>
+	
+	
+	<!-- 查找对应的轮播图片-->
+   <select id="queryPhotoInfo"  useCache="false" resultType="pd" parameterType="pd">
+		 SELECT A.ATTACHMENT_ID,A.ATTACHMENT_NAME,A.ATTACHMENT_PATH,A.ATTACHMENT_TYPE,A.ATTACHMENT_DESCRIPTION,A.ATTACHMENT_CREATETIME,
+		 A.ATTACHMENT_CREATEUSER FROM BL_ATTACHMENT A WHERE A.ATTACHMENT_TYPE='轮播图片' 
+		 <if test="ID != null and ID != ''">
+	    	AND A.ATTACHMENT_ID=#{ID}
+	     </if>
+	     <if test="attachMent_Name != null and attachMent_Name != ''">
+	    	AND A.ATTACHMENT_NAME=#{attachMent_Name}
+	     </if>
+	     <if test="attachMent_CreateTime != null and attachMent_CreateTime != ''">
+	    	AND A.ATTACHMENT_CREATETIME=#{attachMent_CreateTime}
+	     </if>
+	     <if test="attachMent_CreateUser != null and attachMent_CreateUser != ''">
+	    	AND A.ATTACHMENT_CREATEUSER=#{attachMent_CreateUser}
+	     </if>
+		 ORDER BY A.ATTACHMENT_NAME  DESC
+	</select>
+	
+	<!-- 添加轮播图 -->
+	<insert id="insertPhoto" parameterType="pd">
+		INSERT INTO BL_ATTACHMENT(ATTACHMENT_ID,RELATION_ID,ATTACHMENT_NAME,ATTACHMENT_PATH,
+		ATTACHMENT_TYPE,ATTACHMENT_DESCRIPTION,ATTACHMENT_CREATETIME,ATTACHMENT_CREATEUSER)
+		VALUES (#{ID},#{relation_Id},#{attachMent_Name},#{attachMent_Path},#{attachMent_Type},
+		#{attachMent_Description},NOW(),#{attachMent_CreateUser})
+	</insert>
+	
+	<!-- 修改轮播图 -->
+	<update id="updatePhoto" parameterType="pd">
+		UPDATE BL_ATTACHMENT SET ATTACHMENT_NAME=#{attachMent_Name},
+		<if test="attachMent_Path != null and attachMent_Path != ''">
+		ATTACHMENT_PATH =  #{attachMent_Path},
+		</if>
+		ATTACHMENT_DESCRIPTION = #{attachMent_Description} WHERE  ATTACHMENT_ID = #{ID}
+	</update>
+	
+	<!-- 删除轮播图 -->
+	<delete id="deletePhoto" parameterType="pd">
+		DELETE FROM BL_ATTACHMENT WHERE  ATTACHMENT_ID =#{ID}
+	</delete>
+</mapper>

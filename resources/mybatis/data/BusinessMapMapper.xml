@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BusinessMapMapper">
+
+	<!-- 地图 -->
+	<select id="queryBaseInfoList" parameterType="pd" resultType="pd">
+		select bf.MAPY, bf.MAPX,bf.PRIPID,bf.DOM from lp_qrcode_apply qa
+			LEFT JOIN lp_qrcode_print qp on qa.ID = qp.RELATION_ID
+			LEFT JOIN lp_license_record lr on qa.pripid = lr.pripid
+			LEFT JOIN e_baseinfo bf ON bf.ENTNAME = qa.ENTNAME
+			where 1 = 1 
+			<if test="C_COUNTY !='' and C_COUNTY != null ">
+				AND bf.C_COUNTY LIKE CONCAT(CONCAT(#{C_COUNTY}),'%')
+			</if>
+			<if test="entname !='' and entname != null ">
+				and bf.ENTNAME LIKE CONCAT(CONCAT('%', #{entname}),'%') 
+			</if>
+	</select>
+	<!-- 地图 -->
+	<select id="queryBaseInfoListpd" parameterType="pd" resultType="pd">
+		select bf.DOM,bf.PRIPID,bf.MAPX,bf.MAPY from lp_qrcode_apply qa
+			LEFT JOIN lp_qrcode_print qp on qa.ID = qp.RELATION_ID
+			LEFT JOIN lp_license_record lr on qa.pripid = lr.pripid
+			LEFT JOIN e_baseinfo bf ON bf.ENTNAME = qa.ENTNAME
+			where 1 = 1 
+			<if test="C_COUNTY !='' and C_COUNTY != null ">
+				AND bf.C_COUNTY LIKE CONCAT(CONCAT(#{C_COUNTY}),'%')
+			</if>
+	</select>
+	<!-- 查看详情 -->
+	<select id="findBaseInfoById" parameterType="pd" resultType="pd">
+		SELECT PRIPID,UNISCID,REGNO,ENTNAME,NAME,DOM,MAPX,MAPY 
+			FROM e_baseinfo 
+			WHERE PRIPID = #{PRIPID}
+	</select>
+		<!-- 根据 xy 查看详情 -->
+	<select id="findBasexyInfoById" parameterType="pd" resultType="pd">
+		SELECT PRIPID,UNISCID,REGNO,ENTNAME,NAME,DOM 
+			FROM e_baseinfo 
+			WHERE MAPX = #{MAPX} and MAPY = #{MAPY}
+	</select>
+	<!-- 查询地区编码 -->
+	<select id="queryAddressCode" parameterType="pd" resultType="pd" useCache="false" >	
+		SELECT C_NAME,C_CODE FROM zr_sys_area WHERE c_code LIKE '3601%' AND C_STATE = '0' AND c_code != '3601'  ORDER BY C_NAME
+	</select>
+	<!-- 查询省市县 -->
+	<select id="queryCityList" parameterType="pd" resultType="pd">
+		SELECT C_NAME,C_CODE FROM ZR_SYS_AREA 
+		WHERE C_AREA_LEVEL = #{C_AREA_LEVEL} 
+		<if test="C_CODE !='' and C_CODE != null ">
+			AND C_CODE LIKE CONCAT(CONCAT(#{C_CODE}),'%')
+		</if>
+	</select>
+	
+</mapper>

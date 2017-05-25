@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="WarningMapper">
+
+   <!-- 获取预警信息 -->
+    <resultMap type="Map" id="Warninginfo">  
+    </resultMap>
+	<select id="queryWarningInfo" resultMap="Warninginfo,Warninginfo,Warninginfo,Warninginfo,Warninginfo,Warninginfo" useCache="false" 
+	 statementType="CALLABLE" parameterType="pd">
+	   CALL SP_Get_LcWarninginfo(#{pripid})
+	</select>
+    
+</mapper>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MyselferMapper">
+
+   <resultMap type="Map" id="GetMyselferinfo">  
+    </resultMap>
+	<select id="queryAllMyselferinfo" resultMap="GetMyselferinfo,GetMyselferinfo,GetMyselferinfo,GetMyselferinfo,GetMyselferinfo" useCache="false" 
+	 statementType="CALLABLE" parameterType="pd">
+		CALL SP_GetMyselferinfo(#{pripid},#{priptype});
+	</select> 
+   
+	<!-- 企业年报股东及出资信息 -->
+	<select id="queryShareholdersandInvestment" parameterType="pd" resultType="pd" useCache="false">
+	  SELECT I.INV,IP.SUBCONAM,IP.CONFORM,IP.CONFORM_CN,IP.CONDATE,IP.PUBLICDATE,IA.ACCONAM,IA.CONFORM  ACCONFORM,IA.CONFORM_CN ACCONFORM_CN,IA.CONDATE ACCONDATE,IA.PUBLICDATE ACPUBLICDATE 
+	  FROM E_IM_INVESTMENT I,E_IM_INVPRODETAIL IP,E_IM_INVACTDETAIL IA 
+           WHERE IP.INVID=I.INVID AND IA.INVID=I.INVID 
+           AND I.PRIPID=#{pripid} AND IP.PUBLICDATE != '' AND IA.PUBLICDATE != ''
+      <if test="regnore !=null and regnore!=''">
+       AND I.REGNO=#{regnore}
+      </if>
+	</select>
+	<!-- 企业资产状况信息pdf 年报 -->
+	<select id="getAnBaseInfo" parameterType="pd" resultType="pd">
+	select
+	ANCHEID,
+	ANCHEYEAR,
+	ENTNAME,
+	TEL,
+	POSTALCODE,
+	ADDR,
+	EMAIL,
+	EMPNUM,
+	EMPNUMDIS,
+	BUSST_CN,
+	<!-- 企业资产状况信息 -->
+	ASSGRO,
+	ASSGRODIS,
+	VENDINC,
+	VENDINCDIS,
+	MAIBUSINC,
+	MAIBUSINCDIS,
+	RATGRO,
+	RATGRODIS,
+	TOTEQU,
+	TOTEQUDIS,
+	PROGRO,
+	PROGRODIS,
+	NETINC,
+	PROGRODIS,
+	LIAGRO,
+	LIAGRODIS
+	from AN_BASEINFO
+	where pripid = #{pripid}
+	</select>
+	<!-- 企业网站信息pdf  -->
+	<select id="getAnWebsiteInfo" parameterType="String" resultType="pd">
+		select WEBTYPE,WEBSITNAME,DOMAIN from AN_WEBSITEINFO where ANCHEID =#{ANCHEID} 
+	</select>
+</mapper>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="RoleMapper">
+	
+	<!-- 查询角色的父ID -->
+	<select id="queryRoleParnet" resultType="pd" parameterType="String" useCache="false">
+		select ROLE_ID,ROLE_NAME,RIGHTS,PARENT_ID from sys_role where ROLE_ID != "82105b461ef9422ab4f77d4eae6e6012"
+	</select>
+
+	<!-- 查询某个角色信息 -->
+	<select id="queryRoleByRid" parameterType="pd" resultType="pd">
+		select * from sys_role where ROLE_ID = #{ID}
+	</select>
+	
+	<!-- 添加角色 -->
+	<insert id="createRole" parameterType="pd">
+		INSERT INTO SYS_ROLE (ROLE_ID,ROLE_NAME,ROLE_CODE,RIGHTS,PARENT_ID,CREATEUSER_ID,CREATEUSER_NAME,CREATETIME)
+			VALUES(#{role_Id},#{role_Name},#{role_Code},#{rights},#{parent_Id},#{createUser_Id},#{createUser_Name},NOW())
+	</insert>
+	
+	<!-- 查询角色表 -->
+	<select id="queryRolelistPage"  parameterType="page" resultType="pd">
+		SELECT DATE_FORMAT(R.CREATETIME,'%Y-%m-%d %H:%m:%s') AS TIME,R.CREATEUSER_ID,R.CREATEUSER_NAME,R.PARENT_ID,R.RIGHTS,R.ROLE_CODE,
+			R.ROLE_ID,R.ROLE_NAME FROM SYS_ROLE R WHERE ROLE_ID != "82105b461ef9422ab4f77d4eae6e6012" 
+		<if test="pd.ID != null and pd.ID != ''">
+	    	AND R.ROLE_ID = #{pd.ID}
+	    </if>
+	    <if test="pd.parent_id != null and pd.parent_id != ''">
+	    	AND R.PARENT_ID = #{pd.parent_id}
+	    </if>
+	    order by R.CREATETIME desc
+	</select>
+	
+	<!-- 查询权限表 -->
+	<select id="queryMenu"  parameterType="pd" resultType="pd">
+		SELECT M.MENU_ICON,M.MENU_ID,M.MENU_NAME,M.MENU_ORDER,M.MENU_TYPE,M.MENU_URL,M.PARENT_ID,M.PARENT_NAME 
+			FROM SYS_MENU M 
+			WHERE M.MENU_TYPE != 3
+		<if  test="RIGHTS != null and RIGHTS != ''">
+			AND M.MENU_ID = #{RIGHTS}
+		</if>
+		<if  test="MENU_IDS != null and MENU_IDS != ''">
+			AND M.MENU_ID in (${MENU_IDS})
+		</if>
+	</select>
+	
+	<!-- 查询角色的权限 -->
+	<select id="queryRoleMenu"  parameterType="pd" resultType="pd">
+		SELECT M.MENU_ICON,M.MENU_ID,M.MENU_NAME,M.MENU_ORDER,M.MENU_TYPE,M.MENU_URL,M.PARENT_ID,M.PARENT_NAME,
+			(SELECT COUNT(1) FROM SYS_MENU M2 WHERE M2.MENU_ID IN(${MENU_IDS}) AND M2.MENU_ID=M.MENU_ID) AS checked
+			FROM SYS_MENU M
+	</select>
+	
+	<!-- 删除角色 -->
+	<delete id="deleteRole" parameterType="pd">
+		DELETE FROM SYS_ROLE WHERE ROLE_ID = #{ID}
+	</delete>
+	
+	<!-- 修改角色 -->
+	<update id="updateRole" parameterType="pd">
+		UPDATE SYS_ROLE 
+			<set>
+				<if test="role_Code != null and role_Code != ''">ROLE_CODE = #{role_Code},</if>
+				<if test="role_Name != null and role_Name != ''">ROLE_NAME = #{role_Name},</if>
+				<if test="rights != null and rights != ''">RIGHTS = #{rights}</if>
+			</set>
+		 WHERE ROLE_ID = #{ID}
+	</update>
+	
+</mapper>

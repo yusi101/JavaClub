@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="HomePageMapper">
+
+	<!--  得到牌照的申请数量、领取数量、未领取数量 -->
+	<resultMap type="Map" id="IndustryphyCount"></resultMap>
+	<select id="queryIndustryphyCount" resultMap="IndustryphyCount,IndustryphyCount,IndustryphyCount,IndustryphyCount" useCache="false" 
+	 statementType="CALLABLE" parameterType="pd">
+	 CALL SP_GET_QRCODECOUNT();
+	</select>
+
+	<!-- 查询牌照各类型和状态下的数量 -->
+	<select id="queryQrcodeVariousStatusCount" resultMap="IndustryphyCount,IndustryphyCount,IndustryphyCount,IndustryphyCount" useCache="false" 
+	 statementType="CALLABLE" parameterType="pd">
+	 	CALL SP_GET_QrcodeVariousStatusCount();
+	</select>
+	
+</mapper>

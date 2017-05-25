@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SelfUpdataMapper">
+
+	<!-- 获取自主更新信息 	 -->
+	<select id="querySelfUpdatalistPage" parameterType="page" resultType="pd">
+	     SELECT S.CONTENT,S.CREATEUSER_ID,S.CREATE_TIME,S.ENTNAME,S.ID,(SELECT U.NAME FROM SYS_USER U WHERE U.USER_ID = S.CREATEUSER_ID) FOUNDNAME,
+	     S.PRIPID,S.REMARK,S.`STATUS`,S.TITLE,S.TITLEIMG FROM bl_selfupdate S 
+	     WHERE 1=1
+	     <if test="pd.pripid != null and pd.pripid != ''">
+	    	AND S.PRIPID=#{pd.pripid}
+	     </if>
+	     <if test="pd.entName != null and pd.entName != ''">
+	    	AND  S.ENTNAME = #{pd.entName}
+	     </if>
+	     <if test="pd.ID != null and pd.ID != ''">
+	    	AND  S.ID = #{pd.ID}
+	     </if>
+	     <if test="pd.title != null and pd.title != ''">
+	    	AND  S.TITLE  LIKE CONCAT('%',#{pd.title},'%')
+	     </if>
+	      ORDER BY S.CREATE_TIME DESC
+     </select>
+     
+    <!-- 获取自主更新信息  	 -->
+	<select id="querySelfUpdata" parameterType="pd" resultType="pd">
+		 SELECT S.CONTENT,S.CREATEUSER_ID,S.CREATE_TIME,S.ENTNAME,S.ID,(SELECT U.NAME FROM SYS_USER U WHERE U.USER_ID = S.CREATEUSER_ID) FOUNDNAME,
+	     S.PRIPID,S.REMARK,S.`STATUS`,S.TITLE,S.TITLEIMG FROM bl_selfupdate S 
+	     WHERE 1=1
+	     <if test="pripid != null and pripid != ''">
+	    	AND S.PRIPID=#{pd.pripid}
+	     </if>
+	     <if test="entName != null and entName != ''">
+	    	AND  S.ENTNAME = #{entName}
+	     </if>
+	     <if test="ID != null and ID != ''">
+	    	AND  S.ID = #{ID}
+	     </if>
+	      <if test="title != null and title != ''">
+	    	AND  S.TITLE = LIKE CONCAT('%',#{title},'%')
+	     </if>
+	      ORDER BY S.CREATE_TIME DESC
+	</select>
+
+	<select id="queryEntnameByPripid" parameterType="pd" resultType="pd">
+		select pripid,entname from e_baseinfo where pripid = #{pripid}
+	</select>
+	
+	 <!-- 添加自主更新信息 -->
+	<insert id="insertSelfUpdata" parameterType="pd">
+		INSERT INTO BL_SELFUPDATE (CONTENT,CREATEUSER_ID,CREATE_TIME,ENTNAME,ID,PRIPID,REMARK,STATUS,TITLE,TITLEIMG) 
+			VALUES (#{content},#{createUserId},NOW(),#{entName},#{id},#{pripid},#{remark},0,#{title},#{titleimg})
+	</insert>
+
+	
+	<!-- 删除企业自主更新信息 -->
+	<delete id="deleteSelfUpdata" parameterType="pd">
+		DELETE FROM BL_SELFUPDATE WHERE ID = #{ID}
+	</delete>
+	
+	<!-- 企业自主更新审核 -->
+	<update id="updateSelfUpdataAuditing" parameterType="pd">
+		update BL_SELFUPDATE set STATUS = #{status} where ID = #{ID} and STATUS = 0
+	</update>
+	
+	<!-- 企业自主更新修改 -->
+	<update id="updateSelfUpdata" parameterType="pd">
+		UPDATE BL_SELFUPDATE SET  TITLE=#{title},CONTENT=#{content},
+		<if test="titleimg != null and titleimg != ''">
+	    	TITLEIMG=#{titleimg},
+	     </if>
+		REMARK=#{remark},STATUS = 0 WHERE  ID = #{ID}
+	</update>
+	
+	<!-- 审核详情 -->
+	<select id="querySelfUpdataAuditingInfo" parameterType="pd" resultType="pd">
+		SELECT S.ENTNAME,S.TITLE,S.TITLEIMG,S.REMARK,S.CONTENT,S.CREATE_TIME,S.STATUS,(SELECT U.NAME FROM SYS_USER U WHERE U.USER_ID = S.CREATEUSER_ID) FOUNDNAME
+		FROM BL_SELFUPDATE S WHERE S.ID = #{ID}
+	</select>
+</mapper>

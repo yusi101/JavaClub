@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="RegistrationMapper">
+
+	<!-- 查询南昌市开业的公司个数 -->
+	<select id="queryRegstate" parameterType="pd" resultType="pd">
+		 	SELECT
+			Count(r.REGSTATE) AS REGSTATE_COUNT,r.REGSTATE
+			FROM
+			zr_analysis_regstate AS r
+			WHERE r.REGSTATE IS NOT NULL
+		 <if test="county != null and county != '' and county != '3601'">
+		 	and r.AREA_CODE = #{county}
+		 </if>
+		  <if test="startTime != null and startTime != '' ">
+		    <![CDATA[ and r.ESTDATETIME >= DATE_FORMAT(#{startTime},'%Y-%m-%d %T') ]]>
+		</if>
+        <if test="endTime != null and endTime != '' ">
+		    <![CDATA[ and r.ESTDATETIME <= DATE_FORMAT(#{endTime},'%Y-%m-%d %T') ]]>
+		</if>
+		 group by r.REGSTATE
+	</select>
+	
+	<!-- 南昌市的区县 -->
+	<select id="queryCounty" parameterType="pd" resultType="pd">
+		 select * from zr_sys_area where c_code != '360109' and c_code like '3601%' and C_STATE = '0'
+	</select>
+	
+	
+</mapper>

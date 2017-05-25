@@ -1,0 +1,1 @@
+http://qrcode.itsoftjy.com:8282/zhirong.credith5/baseinfo/GoToIndex.do?regnore=#regnore#&KeyNo=#pripid#&priptype=#priptype#

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AnnualReportMapper">
+	
+   	<!-- 年报集合 -->
+   	<resultMap type="Map" id="Report"></resultMap>
+   <!-- 个体年报 -->
+	<select id="GetPBAnnualReport" resultMap="Report,Report,Report,Report" useCache="false" statementType="CALLABLE" parameterType="pd">
+		CALL SP_Get_PB_AnnualReport(#{ancheId})
+	</select>
+	
+	<!-- 农专年报 -->
+	<select id="GetSFCAnnualReport" resultMap="Report,Report,Report,Report,Report" useCache="false" statementType="CALLABLE" parameterType="pd">
+		CALL SP_Get_SFC_AnnualReport(#{ancheId})
+	</select>
+	
+	<!-- 企业年报 -->
+	<select id="GetENTAnnualReport" resultMap="Report,Report,Report,Report,Report,Report,Report" useCache="false" statementType="CALLABLE" parameterType="pd">
+		CALL SP_Get_ENT_AnnualReport(#{ancheId})
+	</select>
+</mapper>

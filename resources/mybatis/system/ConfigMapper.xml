@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ConfigMapper">
+
+	<!-- 获取h5配置信息 -->
+	<select id="querySysMobileTitle" parameterType="pd" resultType="pd" useCache="false">
+        select ID,NAME,KEYNAME,VALUE,REMARK,PARENT_ID,STATUS,ORDER_BY
+			from sys_configure where STATUS = 1 
+			and (PARENT_ID = #{pid} or ID = #{pid})
+	</select>
+
+	<!-- 查询所有配置项 -->
+	<select id="queryConfiglistPage" parameterType="page" resultType="pd" useCache="false">
+		select sys.ID,sys.NAME,sys.KEYNAME,sys.VALUE,sys.REMARK,sys.PARENT_ID,sys.STATUS,sys.ORDER_BY,
+			(select NAME from sys_configure where ID = sys.PARENT_ID) PARENT
+			from sys_configure sys where STATUS = 1
+			<if test="pd.configName != null and pd.configName != ''">
+				and sys.NAME LIKE CONCAT(CONCAT('%', #{pd.configName}),'%')
+			</if>
+			<if test="pd.id != null and pd.id != ''">
+				and sys.ID = #{pd.id}
+			</if>
+			<if test="pd.pid != null and pd.pid != ''">
+				and (sys.PARENT_ID = #{pd.pid} or sys.ID = #{pd.pid})
+			</if>
+			order by sys.ORDER_BY desc
+	</select>
+	
+	<!-- 查询配置系统配置 -->
+	<select id="queryConfigInfo" parameterType="pd" resultType="pd">
+		select sys.ID,sys.NAME,sys.KEYNAME,sys.VALUE,sys.REMARK,sys.PARENT_ID,sys.STATUS,sys.ORDER_BY,
+			(select NAME from sys_configure where ID = sys.PARENT_ID) PARENT
+			from sys_configure sys where STATUS = 1
+			and sys.ID = #{id} or sys.PARENT_ID = #{id}
+			order by sys.ORDER_BY desc
+	</select>
+	
+	<!-- 查询配置项的父ID -->
+	<select id="querySysParnet" resultType="pd" parameterType="String" useCache="false">
+		select ID,NAME,KEYNAME,VALUE,REMARK,PARENT_ID,STATUS,ORDER_BY
+			from sys_configure where STATUS = 1         
+	</select>
+
+	<!-- 添加配置项 -->
+	<insert id="insertConfig" parameterType="pd">
+		insert into sys_configure (ID,NAME,KEYNAME,VALUE,REMARK,ORDER_BY,PARENT_ID)
+			values (#{id},#{name},#{keyname},#{value},#{remark},#{order},#{parent})
+	</insert>
+	
+	<!-- 修改配置项 -->
+	<update id="updateConfig" parameterType="pd">
+		update sys_configure 
+		<set>
+			<if test="name != null">NAME = #{name},</if>
+			<if test="value != null">VALUE = #{value},</if>
+			<if test="remark != null">REMARK = #{remark},</if>
+			<if test="order != null">ORDER_BY = #{order},</if>
+			<if test="parent != null">PARENT_ID = #{parent}</if>
+		</set>
+		where id = #{id};
+	</update>
+	
+	<!-- 批量删除 -->
+	<update id="deleteConfigs" parameterType="java.util.List">  
+	     update sys_configure set STATUS = 0 where ID in     
+	    <foreach collection="list" item="item" open="(" separator="," close=")">
+	  		#{item}  
+	    </foreach>  
+	</update>
+
+</mapper>

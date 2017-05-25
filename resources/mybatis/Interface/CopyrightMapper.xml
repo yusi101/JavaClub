@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CopyrightMapper">
+
+	<!-- 获取软件著作权信息 -->
+	<select id="queryCopyrightInfo" parameterType="pd" resultType="pd">
+		SELECT
+		C.ADDTIME,C.CATEGORYID,C.ENTNAME,C.ID,C.OWNERNAME,C.PRIPID,C.REGISTERDATA,
+		C.REGISTERID,C.REGNO,C.SOFTWARENAME,C.SOFTWARESHORT,C.STARTINGDATE,C.UNISCID,C.UPDATETIME,
+		C.VERSIONNUMBER FROM ZR_LC_COPYRIGHT C WHERE 1=1
+		<if test="pripid != null and pripid != ''">
+			AND C.PRIPID=#{pripid}
+		</if>
+		<if test="copyrightName != null and copyrightName != ''">
+			AND C.SOFTWARENAME LIKE CONCAT('%',#{copyrightName},'%')
+		</if>
+		<if test="copyrightId != null and copyrightId != ''">
+			AND C.ID = #{copyrightId}
+		</if>
+		<if test="entName != null and entName != ''">
+			AND C.ENTNAME LIKE CONCAT('%',#{entName},'%')
+		</if>
+		ORDER BY C.REGISTERDATA DESC
+	</select>
+
+	<!-- 获取软件著作权信息 -->
+	<select id="queryCopyrightInfolistPage" parameterType="page"
+		resultType="pd">
+		SELECT
+		C.ADDTIME,C.CATEGORYID,C.ENTNAME,C.ID,C.OWNERNAME,C.PRIPID,C.REGISTERDATA,
+		C.REGISTERID,C.REGNO,C.SOFTWARENAME,C.SOFTWARESHORT,C.STARTINGDATE,C.UNISCID,C.UPDATETIME,
+		C.VERSIONNUMBER FROM ZR_LC_COPYRIGHT C WHERE 1=1
+		<if test="pd.pripid != null and pd.pripid != ''">
+			AND C.PRIPID=#{pd.pripid}
+		</if>
+		<if test="pd.copyrightName != null and pd.copyrightName != ''">
+			AND C.SOFTWARENAME LIKE CONCAT('%',#{pd.copyrightName},'%')
+		</if>
+		<if test="pd.copyrightId != null and pd.copyrightId != ''">
+			AND C.ID = #{pd.copyrightId}
+		</if>
+		<if test="pd.entName != null and pd.entName != ''">
+			AND C.ENTNAME LIKE CONCAT('%',#{pd.entName},'%')
+		</if>
+		<if test="pd.day != null and pd.day != ''">
+			<![CDATA[ and DATE_FORMAT(C.REGISTERDATA,'%Y-%m-%d') = DATE_FORMAT(#{pd.day},'%Y-%m-%d') ]]>
+		</if>
+		<if test="pd.month != null and pd.month != ''">
+			<![CDATA[ and DATE_FORMAT(C.REGISTERDATA,'%Y-%m') = DATE_FORMAT(#{pd.month},'%Y-%m') ]]>
+		</if>
+		<if test="pd.year != null and pd.year != ''">
+			<![CDATA[ and DATE_FORMAT(C.REGISTERDATA,'%Y') = DATE_FORMAT(#{pd.year},'%Y') ]]>
+		</if>
+		<if test="pd.week != null and pd.week != ''">
+			<![CDATA[ and DATE_FORMAT(C.REGISTERDATA,'%Y-%m-%d') <= DATE_FORMAT(#{pd.week},'%Y-%m-%d') ]]>
+		</if>
+		<if test="pd.endweek != null and pd.endweek != ''">
+			<![CDATA[ and DATE_FORMAT(C.REGISTERDATA,'%Y-%m-%d') >= DATE_FORMAT(#{pd.endweek},'%Y-%m-%d') ]]>
+		</if>
+	</select>
+
+	<!-- 获取著作权信息 -->
+	<select id="queryWorkCopyrightInfo" parameterType="pd"
+		resultType="pd">
+		SELECT C.ADDTIME,C.ENTNAME,C.FINISHDATE,C.FIRSTDATE,C.ID,C.PRIPID,
+		C.REGISTERDATA,C.REGISTERID,C.REGNO,C.UNISCID,C.UPDATETIME,C.WORKCLASS,
+		C.WORKNAME,C.WORKOWNER FROM ZR_LC_WORKCOPYRIGHT C WHERE 1=1
+		<if test="pripid != null and pripid != ''">
+			AND C.PRIPID=#{pripid}
+		</if>
+		<if test="workCopyrightName != null and workCopyrightName != ''">
+			AND C.WORKNAME LIKE CONCAT('%',#{workCopyrightName},'%')
+		</if>
+		<if test="workCopyrightId != null and workCopyrightId != ''">
+			AND C.ID = #{workCopyrightId}
+		</if>
+		
+	</select>
+
+	<!-- 获取著作权信息 -->
+	<select id="queryWorkCopyrightInfolistPage" parameterType="page"
+		resultType="pd">
+		SELECT C.ADDTIME,C.ENTNAME,C.FINISHDATE,C.FIRSTDATE,C.ID,C.PRIPID,
+		C.REGISTERDATA,C.REGISTERID,C.REGNO,C.UNISCID,C.UPDATETIME,C.WORKCLASS,
+		C.WORKNAME,C.WORKOWNER FROM ZR_LC_WORKCOPYRIGHT C WHERE 1=1
+		<if test="pd.pripid != null and pd.pripid != ''">
+			AND C.PRIPID=#{pd.pripid}
+		</if>
+		<if test="pd.workCopyrightId != null and pd.workCopyrightId != ''">
+			AND C.ID = #{pd.workCopyrightId}
+		</if>
+		<if test="pd.entName != null and pd.entName != ''">
+			AND C.ENTNAME LIKE CONCAT('%',#{pd.entName},'%')
+		</if>
+		<if test="pd.classifyId != null and pd.classifyId != ''">
+			AND C.WORKCLASS = #{pd.classifyId}
+		</if>
+		<if test="pd.workCopyrightName != null and pd.workCopyrightName != ''">
+			AND C.WORKNAME LIKE CONCAT('%',#{pd.workCopyrightName},'%')
+		</if>
+		<if test="pd.day != null and pd.day != ''">
+			<![CDATA[ and DATE_FORMAT(C.REGISTERDATA,'%Y-%m-%d') = DATE_FORMAT(#{pd.day},'%Y-%m-%d') ]]>
+		</if>
+		<if test="pd.month != null and pd.month != ''">
+			<![CDATA[ and DATE_FORMAT(C.REGISTERDATA,'%Y-%m') = DATE_FORMAT(#{pd.month},'%Y-%m') ]]>
+		</if>
+		<if test="pd.year != null and pd.year != ''">
+			<![CDATA[ and DATE_FORMAT(C.REGISTERDATA,'%Y') = DATE_FORMAT(#{pd.year},'%Y') ]]>
+		</if>
+		<if test="pd.week != null and pd.week != ''">
+			<![CDATA[ and DATE_FORMAT(C.REGISTERDATA,'%Y-%m-%d') <= DATE_FORMAT(#{pd.week},'%Y-%m-%d') ]]>
+		</if>
+		<if test="pd.endweek != null and pd.endweek != ''">
+			<![CDATA[ and DATE_FORMAT(C.REGISTERDATA,'%Y-%m-%d') >= DATE_FORMAT(#{pd.endweek},'%Y-%m-%d') ]]>
+		</if>
+	</select>
+
+	<!-- 查询著作权类别 -->
+	<select id="queryWorkCopyrightClasslistPage" parameterType="page"
+		resultType="pd">
+		select WORKCLASS FROM zr_lc_workcopyright
+		group by WORKCLASS
+	</select>
+
+
+</mapper>

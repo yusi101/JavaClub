@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="HotFeelingMapper">
+	
+	<!-- 关注热度 -->
+	<select id="queryFollow" parameterType="pd" resultType="pd">
+		SELECT F.PRIPID, F.CREATETIME,E.ENTNAME,E.ENTTYPE_CN,M.USERNAME,COUNT(F.PRIPID) AS COUNT 
+		FROM BL_FOLLOW F,BL_ENTERADDITIONINFO E,BL_MEMBER M
+		WHERE F.MEMBER_ID=M.ID AND F.PRIPID=E.PRIPID 
+		 <if test="startTime != null and startTime != '' ">
+		    <![CDATA[ and F.CREATETIME >= DATE_FORMAT(#{startTime},'%Y-%m-%d %T') ]]>
+		</if>
+        <if test="endTime != null and endTime != '' ">
+		    <![CDATA[ and F.CREATETIME <= DATE_FORMAT(#{endTime},'%Y-%m-%d %T') ]]>
+		</if>
+		GROUP BY F.PRIPID ORDER BY COUNT(F.PRIPID) DESC LIMIT 0,10
+	</select>
+	
+	<!-- 投诉热度 -->
+	<select id="queryComplatnt" parameterType="pd" resultType="pd">
+		SELECT C.PRIPID, C.CREATETIME,E.ENTNAME,E.ENTTYPE_CN,M.USERNAME,COUNT(C.PRIPID) AS COUNT
+		FROM BL_COMPLAINT C,BL_ENTERADDITIONINFO E,BL_MEMBER M
+		WHERE C.MEMBER_ID=M.ID AND C.PRIPID=E.PRIPID
+		<if test="startTime != null and startTime != '' ">
+		    <![CDATA[ and C.CREATETIME >= DATE_FORMAT(#{startTime},'%Y-%m-%d %T') ]]>
+		</if>
+        <if test="endTime != null and endTime != '' ">
+		    <![CDATA[ and C.CREATETIME <= DATE_FORMAT(#{endTime},'%Y-%m-%d %T') ]]>
+		</if> 
+		GROUP BY C.PRIPID ORDER BY COUNT(C.PRIPID) DESC LIMIT 0,10
+	</select>
+	
+	
+	<!-- 评论热度 -->
+	<select id="queryComment" parameterType="pd" resultType="pd">
+		SELECT C.PRIPID, C.CREATETIME,E.ENTNAME,E.ENTTYPE_CN,M.USERNAME,COUNT(C.PRIPID) AS COUNT
+		FROM BL_COMMENT C,BL_ENTERADDITIONINFO E,BL_MEMBER M
+		WHERE C.MEMBER_ID=M.ID AND C.PRIPID=E.PRIPID
+		<if test="startTime != null and startTime != '' ">
+		    <![CDATA[ and C.CREATETIME >= DATE_FORMAT(#{startTime},'%Y-%m-%d %T') ]]>
+		</if>
+        <if test="endTime != null and endTime != '' ">
+		    <![CDATA[ and C.CREATETIME <= DATE_FORMAT(#{endTime},'%Y-%m-%d %T') ]]>
+		</if> 
+		GROUP BY C.PRIPID ORDER BY COUNT(C.PRIPID) DESC LIMIT 0,10
+	</select>
+	
+	
+	<!-- 关注热度详情 -->
+	<select id="queryFollowDetail" parameterType="page" resultType="pd">
+		SELECT F.CREATETIME,M.USERNAME, E.ENTNAME,E.ENTTYPE_CN
+		FROM BL_FOLLOW F,BL_MEMBER M ,BL_ENTERADDITIONINFO E
+		WHERE F.MEMBER_ID=M.ID AND F.PRIPID=E.PRIPID
+		<if test="pd.startTime != null and pd.startTime != '' ">
+		    <![CDATA[ and F.CREATETIME >= DATE_FORMAT(#{pd.startTime},'%Y-%m-%d %T') ]]>
+		</if>
+        <if test="pd.endTime != null and pd.endTime != '' ">
+		    <![CDATA[ and F.CREATETIME <= DATE_FORMAT(#{pd.endTime},'%Y-%m-%d %T') ]]>
+		</if>
+		AND E.ENTNAME=#{pd.name} ORDER BY F.CREATETIME DESC
+	</select>
+	
+	
+	<!-- 投诉热度详情 -->
+	<select id="queryComplatntDetail" parameterType="page" resultType="pd">
+		SELECT C.CREATETIME,C.REMARK,C.TITLE,M.USERNAME, E.ENTNAME,E.ENTTYPE_CN
+		FROM BL_COMPLAINT C,BL_MEMBER M ,BL_ENTERADDITIONINFO E
+		WHERE C.MEMBER_ID=M.ID AND C.PRIPID=E.PRIPID
+		<if test="pd.startTime != null and pd.startTime != '' ">
+		    <![CDATA[ and C.CREATETIME >= DATE_FORMAT(#{pd.startTime},'%Y-%m-%d %T') ]]>
+		</if>
+        <if test="pd.endTime != null and pd.endTime != '' ">
+		    <![CDATA[ and C.CREATETIME <= DATE_FORMAT(#{pd.endTime},'%Y-%m-%d %T') ]]>
+		</if>
+		AND E.ENTNAME=#{pd.name} ORDER BY C.CREATETIME DESC
+	</select>
+	
+	<!-- 评论热度详情 -->
+	<select id="queryCommentDetail" parameterType="page" resultType="pd">
+		SELECT C.CREATETIME,C.REMARK,M.USERNAME, E.ENTNAME,E.ENTTYPE_CN
+		FROM BL_COMMENT C,BL_MEMBER M ,BL_ENTERADDITIONINFO E
+		WHERE C.MEMBER_ID=M.ID AND C.PRIPID=E.PRIPID
+		<if test="pd.startTime != null and pd.startTime != '' ">
+		    <![CDATA[ and C.CREATETIME >= DATE_FORMAT(#{pd.startTime},'%Y-%m-%d %T') ]]>
+		</if>
+        <if test="pd.endTime != null and pd.endTime != '' ">
+		    <![CDATA[ and C.CREATETIME <= DATE_FORMAT(#{pd.endTime},'%Y-%m-%d %T') ]]>
+		</if>
+		AND E.ENTNAME=#{pd.name} ORDER BY C.CREATETIME DESC
+	</select>
+	
+	<!-- 查询热点分析 -->
+	<select id="queryHotspotAnalysis" parameterType="pd" resultType="pd">
+          SELECT K.LOGID,K.KEYWORDS,K.LOGTIME,K.REMARK,COUNT(K.KEYWORDS) AS COUNT
+          FROM SYS_LOG_KEYWORD K WHERE 1=1
+       <if test="startTime != null and startTime != '' ">
+		    <![CDATA[ and DATE_FORMAT(k.LOGTIME,'%Y-%m-%d %T') >= DATE_FORMAT(#{startTime},'%Y-%m-%d %T') ]]>
+		</if>
+        <if test="endTime != null and endTime != '' ">
+		    <![CDATA[ and DATE_FORMAT(k.LOGTIME,'%Y-%m-%d %T') <= DATE_FORMAT(#{endTime},'%Y-%m-%d %T') ]]>
+		</if>
+		<if test="memberId != null and memberId != '' ">
+		    and K.MEMBER_ID=#{memberId}
+		</if>
+		
+		 GROUP BY K.KEYWORDS  ORDER BY COUNT(K.KEYWORDS) DESC LIMIT 0,10
+	</select>
+	<!-- 查询企业热度分析 -->
+	<select id="queryHotEnterprise" parameterType="pd" resultType="pd">
+          SELECT O.LOGID,O.ENTNAME,O.ENTTYPE,O.REGNORE,O.MODULENAME,O.PRIPID,O.LOGTIME,O.REMARK,COUNT(O.PRIPID) AS COUNT 
+          FROM SYS_LOG_OPERATION O WHERE 1=1
+        <if test="startTime != null and startTime != '' ">
+		    <![CDATA[ and DATE_FORMAT(O.LOGTIME,'%Y-%m-%d %T') >= DATE_FORMAT(#{startTime},'%Y-%m-%d %T') ]]>
+		</if>
+        <if test="endTime != null and endTime != '' ">
+		    <![CDATA[ and DATE_FORMAT(O.LOGTIME,'%Y-%m-%d %T') <= DATE_FORMAT(#{endTime},'%Y-%m-%d %T') ]]>
+		</if>
+		 GROUP BY O.PRIPID  ORDER BY COUNT(O.PRIPID) DESC LIMIT 0,10
+	</select>
+	
+	<!-- 点击查询热点分析详情 -->
+	<select id="queryHotspotAnalysislistPage" parameterType="page" resultType="pd">
+	    SELECT K.KEYWORDS ,K.LOGTIME ,K.REMARK ,
+		(SELECT M.USERNAME FROM BL_MEMBER M WHERE M.ID = K.MEMBER_ID) USERNAME 
+		FROM SYS_LOG_KEYWORD K 
+		WHERE 1 = 1 
+		<if test="pd.startTime != null and pd.startTime != '' ">
+			<![CDATA[ and DATE_FORMAT(K.LOGTIME,'%Y-%m-%d %T') >= DATE_FORMAT(#{pd.startTime},'%Y-%m-%d %T') ]]>
+		</if>
+		<if test="pd.endTime != null and pd.endTime != '' ">
+			<![CDATA[ and DATE_FORMAT(K.LOGTIME,'%Y-%m-%d %T') <= DATE_FORMAT(#{pd.endTime},'%Y-%m-%d %T') ]]>
+		</if>
+		<if test="pd.memberId != null and pd.memberId != '' ">
+		    and K.MEMBER_ID=#{pd.memberId}
+		</if>
+		<if test="pd.keywords != null and pd.keywords != '' ">
+		    and K.KEYWORDS = #{pd.keywords}
+		</if>
+		<if test="pd.keywords == null">
+		   GROUP BY K.KEYWORDS ORDER BY COUNT(K.KEYWORDS) DESC
+		</if>
+		
+	</select>
+	
+	<!-- 点击查询企业热度分析详情 -->
+	<select id="queryHotEnterpriselistPage" parameterType="page" resultType="pd">
+		SELECT O.ENTNAME ,O.MODULENAME ,O.LOGTIME ,
+		(SELECT M.USERNAME FROM BL_MEMBER M WHERE M.ID = O.MEMBER_ID) USERNAME 
+		FROM SYS_LOG_OPERATION O 
+		WHERE 1 = 1 
+        <if test="pd.startTime != null and pd.startTime != '' ">
+		    <![CDATA[ and DATE_FORMAT(O.LOGTIME,'%Y-%m-%d %T') >= DATE_FORMAT(#{pd.startTime},'%Y-%m-%d %T') ]]>
+		</if>
+        <if test="pd.endTime != null and pd.endTime != '' ">
+		    <![CDATA[ and DATE_FORMAT(O.LOGTIME,'%Y-%m-%d %T') <= DATE_FORMAT(#{pd.endTime},'%Y-%m-%d %T') ]]>
+		</if>
+		and o.PRIPID = #{pd.pripid}
+		ORDER BY O.LOGTIME DESC
+	</select>
+</mapper>

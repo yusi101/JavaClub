@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="VersionMapper">
+	<!-- 获取app上传列表数据分页 -->
+	<select id="queryVersioninfolistPage" parameterType="page"
+		resultType="pd">
+		SELECT
+		ID,
+		TYPE,
+		NAME,
+		PATH,
+		REMARK,
+		DATE_FORMAT(CREATETIME,'%Y年%m月%d日') AS
+		CREATETIME,
+		VERSION,
+		STATE
+		FROM
+		SYS_VERSION where 1 = 1
+		<if test="pd.name != null and pd.name != ''">
+			AND (TYPE LIKE CONCAT(CONCAT('%', #{pd.name}),'%') OR NAME
+			LIKE CONCAT(CONCAT('%', #{pd.name}),'%') OR VERSION LIKE
+			CONCAT(CONCAT('%', #{pd.name}),'%'))
+		</if>
+		<if test="pd.state != null and pd.state != ''">
+			AND STATE = #{pd.state}
+		</if>
+		ORDER BY VERSION DESC
+	</select>
+
+
+	<!-- 获取app上传列表数据 -->
+	<select id="queryVersioninfo" parameterType="pd" resultType="pd">
+	 <if test="dowmload != null and dowmload != ''">
+			SELECT * FROM (SELECT * FROM (SELECT TYPE,NAME,PATH,REMARK, CREATETIME,
+			VERSION,STATE from SYS_VERSION  ORDER BY VERSION DESC,CREATETIME DESC) V WHERE STATE=0 
+			<if test="type != null and type != ''">	
+        			AND TYPE=#{type}
+        	</if>	
+        	<if test="appname != null and appname != ''">	
+        			AND NAME=#{appname}
+        	</if>	
+			ORDER BY TYPE ASC,VERSION DESC,CREATETIME ASC) T GROUP BY TYPE
+	 </if>
+	 <if test="dowmload == null or dowmload == ''">
+	 	SELECT TYPE,NAME,PATH,REMARK,DATE_FORMAT(CREATETIME,'%Y年%m月%d日') AS CREATETIME,
+		VERSION,STATE
+		FROM SYS_VERSION where 1 = 1
+		<if test="name != null and name != ''">
+			AND (TYPE LIKE CONCAT(CONCAT('%', #{name}),'%') OR NAME
+			LIKE CONCAT(CONCAT('%', #{name}),'%') OR VERSION LIKE
+			CONCAT(CONCAT('%', #{name}),'%'))
+		</if>
+		<if test="state != null and state != ''">
+			AND STATE = #{state}
+		</if>
+		ORDER BY VERSION DESC
+	 </if>
+	</select>
+	
+	<!-- 获取app上传列表数据  oracle-->
+	<select id="queryVersioninfoOracle" parameterType="pd" resultType="pd">
+	 <if test="dowmload != null and dowmload != ''">
+			SELECT TYPE,NAME,PATH,REMARK,CREATETIME,STATE,VERSION FROM 
+    			(SELECT TYPE,NAME,PATH,REMARK,CREATETIME,STATE,VERSION,ROW_NUMBER() OVER (PARTITION BY TYPE ORDER BY CREATETIME DESC) AS TYPE_COUNT
+        			FROM SYS_VERSION WHERE STATE=0 
+        		<if test="type != null and type != ''">	
+        			AND TYPE=#{type}
+        		</if>	
+        			) WHERE <![CDATA[  TYPE_COUNT < 2 ]]>
+	 </if>
+	 <if test="dowmload == null or dowmload == ''">
+	 	SELECT TYPE,NAME,PATH,REMARK,DATE_FORMAT(CREATETIME,'%Y年%m月%d日') AS CREATETIME,
+		VERSION,STATE
+		FROM SYS_VERSION where 1 = 1
+		<if test="name != null and name != ''">
+			AND (TYPE LIKE CONCAT(CONCAT('%', #{name}),'%') OR NAME
+			LIKE CONCAT(CONCAT('%', #{name}),'%') OR VERSION LIKE
+			CONCAT(CONCAT('%', #{name}),'%'))
+		</if>
+		<if test="state != null and state != ''">
+			AND STATE = #{state}
+		</if>
+		ORDER BY VERSION DESC
+	 </if>
+	</select>
+	
+	
+	<!-- 删除app上传状态 -->
+	<update id="updateVersionById" parameterType="pd">
+		update SYS_VERSION set STATE = 1, CREATEUSER_ID = #{USERID}, CREATENAME_NAM = #{USERNAME}
+			where ID = #{id}
+	</update>
+	
+	<!-- 插入数据 -->
+	<insert id="insertVersion" parameterType="pd">
+		INSERT INTO SYS_VERSION
+		(
+		ID,
+		NAME,
+		PATH,
+		VERSION,
+		CREATETIME,
+		STATE,
+		REMARK,
+		TYPE,
+		CREATEUSER_ID,
+		CREATENAME_NAM
+		)
+		VALUE
+		(
+		#{ID},#{NAME},#{PATH},#{VERSION},now(),#{STATE},#{DESCS},#{TYPE},#{USERID},#{USERNAME})
+
+	</insert>
+	<!-- 查询单条 -->
+	<select id="queryVersionById" parameterType="pd" resultType="pd">
+		SELECT ID,
+		NAME,
+		PATH,
+		VERSION,
+		CREATETIME,
+		STATE,
+		REMARK,
+		TYPE FROM
+		SYS_VERSION
+		WHERE
+		ID=#{id}
+	</select>
+
+	<!-- 带地址修改 -->
+	<update id="updateAppPath" parameterType="pd">
+		UPDATE SYS_VERSION
+		SET TYPE = #{TYPE},
+		<if test="PATH != null and PATH != ''">
+			PATH=#{PATH},
+		</if>
+		<if test="NAME != null and NAME != ''">
+			NAME = #{NAME},
+		</if>
+		REMARK = #{REMARK},
+		CREATEUSER_ID =#{USERID},
+		CREATENAME_NAM=#{USERNAME},
+		VERSION =#{VERSION}
+		WHERE
+		ID =#{ID}
+	</update>
+
+</mapper>

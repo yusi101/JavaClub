@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserMapper">
+
+	<!-- 查询全部用户数据 -->
+	<select id="queryUserlistPage" parameterType="page" resultType="pd">
+		SELECT USER_ID,USERNAME,SEX,NAME,EMAIL,PHONE FROM SYS_USER
+			where STATUS = 0
+		<if test="pd.NAME != null and pd.NAME != '' ">
+			and (USERNAME = #{pd.NAME} OR NAME = #{pd.NAME})
+		</if>
+		and USER_ID != '0'
+	</select>
+	
+	<!-- 查询用户角色数据 -->
+	<select id="queryUserRoleInfo" parameterType="pd" resultType="pd">
+		select r.ROLE_ID,r.ROLE_NAME,r.PARENT_ID,ur.USER_ID from sys_role r
+			left join sys_user_role ur on r.ROLE_ID = ur.ROLE_ID
+			and ur.USER_ID = #{USERID}
+			where r.ROLE_ID != '82105b461ef9422ab4f77d4eae6e6012'
+	</select>
+	<!-- 查询用户角色数据 -->
+	<select id="queryUserRoleMenuInfo" parameterType="pd" resultType="pd">
+		SELECT MENU_ID,MENU_NAME,MENU_URL,PARENT_ID,MENU_ORDER,MENU_ICON icon from sys_menu_copy 
+	</select>
+	
+	
+	<!-- 删除用户角色数据 -->
+	<delete id="deleteUserRole" parameterType="pd">
+		DELETE FROM sys_user_role WHERE USER_ID = #{USERID} 
+	</delete>
+
+	<!-- 查询单个用户数据 -->
+	<select id="queryUserByIdInfo" parameterType="pd" resultType="pd">
+		SELECT USER_ID,USERNAME,PASSWORD,NAME,STATUS,REMARK,SEX,EMAIL,PHONE
+			FROM SYS_USER WHERE USER_ID = #{USERID}
+	</select>
+
+	<!-- 删除单个用户数据 -->
+	<update id="updateUserByid" parameterType="pd">
+		UPDATE sys_user s SET s.STATUS = 1 WHERE USER_ID = #{USERID}
+	</update>
+	
+	<!-- 新增用户信息 -->
+	<insert id="insertUser" parameterType="pd">
+		INSERT INTO SYS_USER (USER_ID,USERNAME,PASSWORD,NAME,STATUS,REMARK,SEX,EMAIL,PHONE,PRIPID)
+			VALUES(#{USERID},#{USERNAME},#{PASSWORD},#{NAME},#{STATUS},#{REMARK},#{SEX},#{EMAIL},#{PHONE},#{PRIPID})
+	</insert>
+	
+	<!-- 新增用户信息（已注册被删除的情况下） -->
+	<update id="updateUser" parameterType="pd">
+		UPDATE sys_user s SET s.STATUS = 0,s.PASSWORD = #{PASSWORD},s.NAME = #{NAME},s.REMARK = #{REMARK},s.SEX = #{SEX},s.EMAIL = #{EMAIL},s.PHONE = #{PHONE},s.PRIPID = #{PRIPID}
+		  WHERE s.USERNAME = #{USERNAME}
+	</update>
+
+	<!-- 新增用户角色信息 -->
+	<insert id="insertUserRole" parameterType="pd">
+		INSERT INTO sys_user_role(ID,ROLE_ID,USER_ID,CREATEUSER_ID,CREATETIME,REMARK)
+			VALUES (#{ID},#{RID},#{USERID},#{UID},NOW(),#{REMARK})
+	</insert>
+
+    <!-- 修改 -->
+	<update id="updateUserById" parameterType="pd">
+		UPDATE SYS_USER SET
+		<if test="USERNAME != null and USERNAME != '' ">USERNAME = #{USERNAME},</if>
+		<if test="NAME != null and NAME != '' ">NAME = #{NAME},</if>
+		REMARK = #{REMARK},
+		<if test="SEX != null and SEX != '' ">SEX = #{SEX},</if>
+		<if test="EMAIL != null and EMAIL != '' ">EMAIL = #{EMAIL},</if>
+		<if test="PHONE != null and PHONE != '' ">PHONE = #{PHONE},</if>
+		<if test="IP != null and IP != '' ">IP = #{IP},</if>
+		<if test="LAST_LOGIN != null and LAST_LOGIN != '' ">LAST_LOGIN = #{LAST_LOGIN},</if>
+		USER_ID = #{USERID}
+		WHERE USER_ID = #{USERID}
+	</update>
+
+	<!-- 判断用户名是否存在 存在则不进行添加此用户 -->
+	<select id="queryUserName" parameterType="page" resultType="pd">
+		SELECT USERNAME,STATUS FROM sys_user WHERE USERNAME = #{USERNAME}
+	</select>
+	
+</mapper>

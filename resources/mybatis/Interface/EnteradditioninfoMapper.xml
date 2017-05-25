@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="EnteradditioninfoMapper">
+
+	<!-- 获取企业基本信息 -->
+	<select id="getEnteradditioninfolistPage" parameterType="page"
+		resultType="pd">
+		SELECT
+		ID,
+		PRIPID,
+		REGNORE,
+		ENTNAME,
+		UNISCID,
+		ENTTYPE,
+		ENTTYPE_CN,
+		REGORG_CN,
+		OPSCOTYPE_CN,
+		REGSTATE_CN,
+		REGCAP,
+		REGCAPCUR_CN,
+		NAME,
+		INDUSTRYPHY,
+		C_PROVINCE,
+		C_CITY,
+		C_COUNTY,
+		OPFROM,
+		OPTO,
+		ESTDATE,
+		DOM,
+		MAPX,
+		MAPY
+		FROM
+		bl_enteradditioninfo
+		where 1 = 1
+		  <if test="pd.entname != null and pd.entname != ''">
+		  	AND ENTNAME LIKE CONCAT(CONCAT('%', #{pd.entname}),'%') OR UNISCID = #{pd.entname} OR REGNORE = #{pd.entname}
+		  </if>
+	</select>
+
+
+	<!-- 获取企业基本信息 -->
+	<select id="getEnteradditioninfo" parameterType="pd" resultType="pd">
+	SELECT
+		ID,
+		PRIPID,
+		REGNORE,
+		ENTNAME,
+		UNISCID,
+		ENTTYPE,
+		ENTTYPE_CN,
+		REGORG_CN,
+		OPSCOTYPE_CN,
+		REGSTATE_CN,
+		REGCAP,
+		REGCAPCUR_CN,
+		NAME,
+		INDUSTRYPHY,
+		C_PROVINCE,
+		C_CITY,
+		C_COUNTY,
+		OPFROM,
+		OPTO,
+		ESTDATE,
+		DOM,
+		MAPX,
+		MAPY
+		FROM
+		bl_enteradditioninfo
+		where 1 = 1
+		  <if test="entname != null and entname != ''">
+		  	AND ENTNAME LIKE CONCAT(CONCAT('%', #{entname}),'%') OR UNISCID = #{entname} OR REGNORE = #{entname}
+		  </if>
+	</select>
+</mapper>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CommentMapper">
+	
+	<!-- 查询所有评论 -->
+	<select id="queryCommentlistPage" parameterType="page" resultType="pd">
+		SELECT E.ENTNAME,M.USERNAME,M.ALIASNAME,B.REMARK,B.ID,B.STATUS,B.PID,B.SUCCESSQTY,B.FAILEDQTY,
+	    DATE_FORMAT(B.CREATETIME,'%Y-%m-%d %H:%m:%s') AS COMMENTTIME FROM BL_ENTERADDITIONINFO E,
+	    BL_MEMBER M,BL_COMMENT B WHERE E.PRIPID=B.PRIPID AND B.MEMBER_ID=M.ID 
+       	<if test="pd.aliasname != null and pd.aliasname != ''">
+			AND M.ALIASNAME LIKE CONCAT(CONCAT('%',#{pd.aliasname}),'%') 
+		</if>
+		<if test="pd.ID != null and pd.ID != ''">
+			AND B.ID = #{pd.ID} 
+		</if>
+		<if test="pd.status != null and pd.status != '' and pd.status != 3">
+			and B.STATUS = #{pd.status}
+		</if>
+        <if test="pd.startDay != null and  pd.startDay != '' ">
+		  	<![CDATA[ AND DATE_FORMAT(B.CREATETIME,'%Y-%m-%d') >= #{pd.startDay} ]]>
+		</if>
+		<if test="pd.endDay != null and pd.endDay != '' ">
+		   	<![CDATA[ AND DATE_FORMAT(B.CREATETIME,'%Y-%m-%d') <= #{pd.endDay} ]]>
+		</if>
+		
+		ORDER BY B.STATUS ASC, B.CREATETIME DESC
+	</select>
+	
+	<!-- 评论审核详情 -->
+	<select id="queryCommentDetails" parameterType="pd" resultType="pd">
+		SELECT E.ENTNAME,M.USERNAME,M.ALIASNAME,B.REMARK,B.ID,B.STATUS,B.PID,B.SUCCESSQTY,B.FAILEDQTY,
+	    DATE_FORMAT(B.CREATETIME,'%Y-%m-%d') AS COMMENTTIME,R.CREATETIME AS AUDITTIME,R.RESULTREMARK,S.`NAME`
+        FROM BL_ENTERADDITIONINFO E,BL_MEMBER M,BL_COMMENT B,BL_RESPONDED R,SYS_USER S 
+        WHERE E.PRIPID=B.PRIPID AND B.MEMBER_ID=M.ID AND R.RELATION_ID = B.ID AND R.CREATEUSER_ID = S.USER_ID
+  		AND R.TYPE_ID = '评论' AND B.ID = #{ID} 
+	</select>
+	
+	<!-- 审核评论 -->
+	<update id="updateComment" parameterType="pd">
+		UPDATE BL_COMMENT SET STATUS = #{status} WHERE ID = #{ID} and STATUS = 0
+	</update>
+	
+	<!-- 审核记录添加 -->
+	<insert id="createResponded" parameterType="pd">
+		INSERT INTO BL_RESPONDED(ID,RELATION_ID,TYPE_ID,CREATEUSER_ID,CREATETIME,RESULTREMARK)
+		VALUES (#{respondedId},#{ID},#{type_Id},#{createUser_Id},NOW(),#{resultreMark})
+	</insert>
+</mapper>

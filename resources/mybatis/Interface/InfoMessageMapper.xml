@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="InfoMessageMapper">
+
+	<!-- 企业或个体基本工商信息及其他信息 -->
+   	<resultMap type="Map" id="Allbaseinfo"></resultMap>
+   	
+	<select id="queryAllBaseInfo" resultMap="Allbaseinfo,Allbaseinfo,Allbaseinfo,Allbaseinfo,Allbaseinfo,Allbaseinfo" useCache="false" 
+	 statementType="CALLABLE" parameterType="pd">
+		CALL SP_GET_BASEINFO(#{pripid},#{priptype})
+	</select>
+</mapper>

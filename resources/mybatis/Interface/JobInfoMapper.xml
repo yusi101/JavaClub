@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="JobInfoMapper">
+
+	<!-- 查询招聘信息 分页 -->
+	<select id="queryJobInfolistPage" parameterType="page" resultType="pd" useCache="false">
+	   SELECT J.ID,J.ENTNAME,J.PRIPID,J.POSITION,J.SITE,J.SALARY,J.RELEASE_DATE,J.FETCH_URL,J.FETCH_TIME,J.VISIT_NUM,J.FETCH_WEBSITE
+	   <if test="pd.jobId != null and pd.jobId != ''">
+			,J.DETAIL
+	   </if>
+       FROM ZR_LC_JOBINFO J WHERE 1=1
+	   <if test="pd.pripid != null and pd.pripid != ''">
+			AND J.PRIPID=#{pd.pripid}
+	   </if>
+	   <if test="pd.jobId != null and pd.jobId != ''">
+			AND J.ID=#{pd.jobId}
+	   </if>
+	    ORDER BY J.RELEASE_DATE DESC
+	</select>
+	
+	
+	<!-- 查询招聘信息 不分页 -->
+    <select id="queryJobInfo" parameterType="pd" resultType="pd">
+	 SELECT J.ID,J.ENTNAME,J.PRIPID,J.POSITION,J.SITE,J.SALARY,J.RELEASE_DATE,J.FETCH_URL,J.FETCH_TIME,J.VISIT_NUM,J.FETCH_WEBSITE
+	   <if test="jobId != null and jobId != ''">
+			,J.DETAIL
+	   </if>
+       FROM ZR_LC_JOBINFO J WHERE 1=1
+	   <if test="pripid != null and pripid != ''">
+			AND J.PRIPID=#{pripid}
+	   </if>
+	   <if test="jobId != null and jobId != ''">
+			AND J.ID=#{jobId}
+	   </if>
+	    ORDER BY J.RELEASE_DATE DESC
+    </select>
+</mapper>

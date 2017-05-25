@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="QRCodeMapper">
+
+	<!-- 返回结果集Map -->
+	<resultMap type="Map" id="QRCode"></resultMap>
+	
+	<!-- 查询证件类型 -->
+	<select id="querySysCodeInfo" resultType="pd">
+		select * from ZR_SYS_CODE where EC_CODE = 'CB16'
+	</select>
+	
+	<!-- 查询牌照编码信息 -->
+	<select id="queryLicenseRecordInfo" parameterType="pd" resultType="pd">
+		select * from lp_license_record where pripid = #{pripid}
+	</select>
+	
+	<!-- 添加牌照编码信息 -->
+	<insert id="insertLicenseRecord" parameterType="pd">
+		insert into lp_license_record (ENTNAME,PRIPID,LICENSECODE,LICENSENUMBER,CREATETIME,CREATEUSER_ID,CREATEUSER_NAME)
+			values (#{entname},#{pripid},#{codeImg},#{code},NOW(),#{uid},#{uname})
+	</insert>
+	
+	<!-- 查询企业信息 -->
+	<select id="queryEntInfo" parameterType="pd" resultType="pd">
+		select * from bl_enteradditioninfo where 1 = 1
+		<if test="entname != null and entname != ''">
+			and ENTNAME = #{entname} 
+		</if>
+		<if test="regno != null and regno != ''">
+			and REGNORE = #{regno}
+		</if>
+		<if test="(regno == null or regno == '') and (entname == null or entname == '')">
+			and 1&lt;&gt;1
+		</if>
+	</select>
+	<!-- 企业 -->
+	<select id="queryEntInfoqyByPripid" parameterType="pd" resultType="pd">
+		select lr.* from e_baseinfo ent,lp_license_record lr where ent.PRIPID = lr.PRIPID
+		<if test="pripid != null and pripid != ''">
+			and ent.PRIPID = #{pripid} 
+		</if>
+		<if test="pripid == null or pripid == ''">
+			and 1&lt;&gt;1
+		</if>
+	</select>
+	<!-- g个体 -->
+	<select id="queryEntInfogtByPripid" parameterType="pd" resultType="pd">
+		select lr.* from e_baseinfo ent,lp_license_record lr where ent.PRIPID = lr.PRIPID
+		<if test="pripid != null and pripid != ''">
+			and ent.PRIPID = #{pripid} 
+		</if>
+		<if test="pripid == null or pripid == ''">
+			and 1&lt;&gt;1
+		</if>
+	</select>
+	
+	<!-- 添加牌照申请 -->
+	<insert id="insertQRCodeApply" parameterType="pd">
+		insert into lp_qrcode_apply (ID,APPLYWAY,APPLYWAY_CN,APPLYTYPE,APPLYTYPE_CN,APPLY_ID,APPLY_NAME,CERTYPE,
+			CERTYPE_CN,CERNO,POSITION,ADDRESS,TEL,EMAIL,SEX,IDCARD_COPY_DIS,BUSINESS_LICENSE_DIS,APPLICATIONS_DIS,
+			ENTNAME,PRIPID,REGNO,UNISCID,APPLY_NUMBER,CREATETIME,REMARK,STATUS)
+		values (#{aid},#{applyWay},#{applyWayCN},#{applyType},#{applyTypeCN},#{applyId},#{applyName},#{cerType},
+			#{cerTypeCN},#{cerno},#{position},#{address},#{tel},#{email},#{sex},#{idcardCopyDis},#{businessLicenseDis},
+			#{applicationsDis},#{entname},#{pripid},#{regno},#{uniscid},#{applyNumber},NOW(),#{remark},#{astatus})
+	</insert>
+	
+	<!-- 修改牌照申请 -->
+	<update id="updateQRCodeApply" parameterType="pd">
+		update lp_qrcode_apply 
+		<set>
+			<if test="applyType != null and applyType != ''">APPLYTYPE = #{applyType},</if>
+			<if test="applyTypeCN != null and applyTypeCN != ''">APPLYTYPE_CN = #{applyTypeCN},</if>
+			<if test="applyName != null and applyName != ''">APPLY_NAME = #{applyName},</if>
+			<if test="cerType != null and cerType != ''">CERTYPE = #{cerType},</if>
+			<if test="cerTypeCN != null and cerTypeCN != ''">CERTYPE_CN = #{cerTypeCN},</if>
+			<if test="cerno != null and cerno != ''">CERNO = #{cerno},</if>
+			<if test="position != null and position != ''">POSITION = #{position},</if>
+			<if test="address != null and address != ''">ADDRESS = #{address},</if>
+			<if test="tel != null and tel != ''">TEL = #{tel},</if>
+			<if test="email != null and email != ''">EMAIL = #{email},</if>
+			<if test="sex != null and sex != ''">SEX = #{sex},</if>
+			<if test="idcardCopyDis != null and idcardCopyDis != ''">IDCARD_COPY_DIS = #{idcardCopyDis},</if>
+			<if test="businessLicenseDis != null and businessLicenseDis != ''">BUSINESS_LICENSE_DIS = #{businessLicenseDis},</if>
+			<if test="applicationsDis != null and applicationsDis != ''">APPLICATIONS_DIS = #{applicationsDis},</if>
+			<if test="applyNumber != null and applyNumber != ''">APPLY_NUMBER = #{applyNumber},</if>
+			<if test="remark != null and remark != ''">REMARK = #{remark}</if>
+		</set>
+		where ID = #{aid}
+	</update>
+	
+	<!-- 查询牌照申请记录 -->
+	<select id="queryApplyRecordslistPage" resultType="pd" parameterType="page">
+		select qa.*,qp.STATUS QPSTATUS,qp.ID PID,qp.CREATEUSER_NAME PNAME,lr.LICENSECODE,lr.LICENSENUMBER,bf.`NAME` from lp_qrcode_apply qa
+			left join lp_qrcode_print qp on qa.ID = qp.RELATION_ID
+			left join lp_license_record lr on qa.pripid = lr.pripid
+			LEFT JOIN e_baseinfo AS bf ON bf.ENTNAME = qa.ENTNAME
+			where 1 = 1
+		<if test="pd.entname != null and pd.entname != ''">
+			and qa.ENTNAME LIKE CONCAT(CONCAT('%', #{pd.entname}),'%') or bf.`NAME` LIKE CONCAT(CONCAT('%', #{pd.entname}),'%')
+		</if>
+		<if test="pd.pripid != null and pd.pripid != ''">
+			and qa.PRIPID = #{pd.pripid}
+		</if>
+		<if test="pd.aid != null and pd.aid != ''">
+			and qa.ID = #{pd.aid}
+		</if>
+		<if test="pd.startTime != null and pd.startTime != ''">
+			and qa.CREATETIME &gt;= #{pd.startTime}
+		</if>
+		<if test="pd.endTime != null and pd.endTime != ''">
+			and qa.CREATETIME &lt;= date_add(#{pd.endTime}, interval 1 day)
+		</if>
+		order by qa.CREATETIME desc
+	</select>
+	
+	<!-- 查询某个牌照记录详情 -->
+	<select id="queryQRCodeById" resultMap="QRCode,QRCode,QRCode,QRCode,QRCode,QRCode,QRCode,QRCode,QRCode" useCache="false" 
+		statementType="CALLABLE" parameterType="pd">
+		CALL SP_Get_AllQRCodeRecord(#{aid},#{pid},#{pripid})
+	</select>
+	
+	<!-- 查询牌照打印记录 -->
+	<select id="queryQRCodePrintlistPage" resultType="pd" parameterType="page">
+		select * from lp_qrcode_apply where 1 = 1	
+		<if test="pd.entname != null and pd.entname != ''">
+			and ENTNAME LIKE CONCAT(CONCAT('%', #{pd.entname}),'%') 
+		</if>	
+		<if test="pd.status != null and pd.status != ''">
+			and STATUS = #{pd.status}
+		</if>
+		<if test="pd.startTime != null and pd.startTime != ''">
+			and CREATETIME &gt;= #{pd.startTime}
+		</if>
+		<if test="pd.endTime != null and pd.endTime != ''">
+			and CREATETIME &lt;= date_add(#{pd.endTime}, interval 1 day)
+		</if>
+		order by CREATETIME desc
+	</select>
+	
+	<!-- 添加牌照打印 -->
+	<insert id="insertQRCodePrint" parameterType="pd">
+		insert into lp_qrcode_print (ID,RELATION_ID,LICENSECODE,NUMBER,STATUS,
+			CREATETIME,CREATEUSER_ID,CREATEUSER_NAME)
+		values (#{pid},#{aid},#{codeImg},#{applyNumber},#{pstatus},NOW(),#{uid},#{uname})
+	</insert>
+	
+	<!-- 修改牌照打印 -->
+	<update id="updatePrintById" parameterType="pd">
+		update lp_qrcode_print 
+		<set>
+			<if test="status != null">STATUS = #{status},</if>
+			<if test="licensecode != null">LICENSECODE = #{licensecode}</if>
+		</set>
+		where ID = #{pid}
+		<!-- 用于防止并发操作，用于防止幻读 -->
+		<if test="status == 1 or status == 2">
+			and STATUS = 0
+		</if>
+		<if test="status == 3">
+			and STATUS = 1
+		</if>
+		<if test="status == 4">
+			and STATUS = 3
+		</if>
+		<if test="status == 7">
+			and (STATUS = 4 || STATUS = 6)
+		</if>		
+	</update>
+	
+	<!-- 添加牌照回执单打印记录 -->
+	<insert id="insertQRCodeReceipts" parameterType="pd">
+		insert into lp_qrcode_receipts (ID,RELATION_ID,CREATETIME,CREATEUSER_ID,CREATEUSER_NAME)
+			values (#{rid},#{aid},NOW(),#{uid},#{uname})
+	</insert>
+	
+	<!-- 添加营业执照打印记录 -->
+	<insert id="inseertBusinessLicense" parameterType="pd">
+		insert into lp_business_license (ID,ENTNAME,PRIPID,CREATETIME,CREATEUSER_ID,CREATEUSER_NAME)
+			values (#{lid},#{entname},#{pripid},NOW(),#{uid},#{uname})
+	</insert>
+	
+	<!-- 查询某个牌照正常审核  企业-->
+	<select id="queryQRCodeAuditByIdqy" parameterType="pd" resultType="pd">
+		<!-- select * from lp_qrcode_print where id = #{id} -->
+		<!-- select qp.ID,qp.LICENSECODE,qp.STATUS,qp.NUMBER,be.REGNORE,be.ENTNAME,be.REGSTATE_CN,be.REGCAP,be.REGCAPCUR_CN,be.NAME,be.ESTDATE
+			from lp_qrcode_print qp 
+			left join lp_qrcode_apply qa on qp.RELATION_ID = qa.ID
+			left join bl_enteradditioninfo be on qa.PRIPID = be.PRIPID
+			where qp.id = #{id} -->
+			select qp.ID,qp.RELATION_ID,qp.LICENSECODE,qp.STATUS,qp.NUMBER,be.REGNO AS REGNORE,be.ENTNAME,be.REGSTATE_CN,be.REGCAP,be.REGCAPCUR_CN,be.NAME,be.ESTDATE
+			from lp_qrcode_print qp 
+			left join lp_qrcode_apply qa on qp.RELATION_ID = qa.ID
+			left join e_baseinfo be on qa.PRIPID = be.PRIPID
+			where qp.id = #{id}
+	</select>
+	<!-- 查询某个牌照正常审核 个体-->
+	<select id="queryQRCodeAuditByIdgt" parameterType="pd" resultType="pd">
+		<!-- select * from lp_qrcode_print where id = #{id} -->
+		<!-- select qp.ID,qp.LICENSECODE,qp.STATUS,qp.NUMBER,be.REGNORE,be.ENTNAME,be.REGSTATE_CN,be.REGCAP,be.REGCAPCUR_CN,be.NAME,be.ESTDATE
+			from lp_qrcode_print qp 
+			left join lp_qrcode_apply qa on qp.RELATION_ID = qa.ID
+			left join bl_enteradditioninfo be on qa.PRIPID = be.PRIPID
+			where qp.id = #{id} -->
+			select qp.ID,qp.RELATION_ID,qp.LICENSECODE,qp.STATUS,qp.NUMBER,be.REGNO AS REGNORE,be.TRANAME AS ENTNAME,be.REGSTATE_CN,be.FUNDAM AS REGCAP,'人民币' AS REGCAPCUR_CN,be.NAME,be.ESTDATE
+			from lp_qrcode_print qp 
+			left join lp_qrcode_apply qa on qp.RELATION_ID = qa.ID
+			left join e_pb_baseinfo be on qa.PRIPID = be.PRIPID
+			where qp.id = #{id};
+	</select>
+	<!-- 查询牌照正常审核记录 -->
+	<select id="queryQRCodeAuditlistPage" resultType="pd" parameterType="page">
+		select qa.ENTNAME,qa.APPLY_NUMBER,lr.LICENSENUMBER QRCODENAME,qp.* from lp_qrcode_print qp
+			left join lp_qrcode_apply qa on qp.RELATION_ID = qa.ID 
+			left join lp_license_record lr on qa.PRIPID = lr.PRIPID
+			where qp.STATUS = 0
+		<if test="pd.entname != null and pd.entname != ''">
+			and qa.ENTNAME LIKE CONCAT(CONCAT('%', #{pd.entname}),'%') 
+		</if>
+		<if test="pd.startTime != null and pd.startTime != ''">
+			and qp.CREATETIME &gt;= #{pd.startTime}
+		</if>
+		<if test="pd.endTime != null and pd.endTime != ''">
+			and qp.CREATETIME &lt;= date_add(#{pd.endTime}, interval 1 day)
+		</if>		
+		order by qp.CREATETIME desc
+	</select>
+
+	<!-- 修改牌照正常审核状态 -->
+	<update id="updateById" parameterType="pd">
+		update lp_qrcode_print set STATUS = #{status} where id = #{id}
+	</update>	
+	
+	<!-- 添加牌照状态审核 -->
+	<insert id="insertQRCodeAudit" parameterType="pd">
+		insert into lp_qrcode_stateaudit (ID,RELATION_ID,APPROVE_TIME,APPROVEUSER_ID,APPROVEUSER_NAME)
+			values (#{sid},#{pid},NOW(),#{uid},#{uname})
+	</insert>
+
+	<!-- 查询牌照异常 -->
+	<select id="queryQRCodeAbnormallistPage" parameterType="pd" resultType="pd">
+		select qa.PRIPID,qa.ENTNAME,qp.STATUS,qp.LICENSECODE,qp.NUMBER,lr.LICENSENUMBER,qaa.* 
+			from lp_qrcode_abnormal qaa
+			left join lp_qrcode_print qp on qaa.RELATION_ID = qp.ID
+			left join lp_qrcode_apply qa on qp.RELATION_ID = qa.ID 
+			left join lp_license_record lr on qa.PRIPID = lr.PRIPID
+			where 1 = 1
+		<if test="pd.entname != null and pd.entname != ''">
+			and qa.ENTNAME LIKE CONCAT(CONCAT('%', #{pd.entname}),'%') 
+		</if>
+		<if test="pd.aid != null and pd.aid != ''">
+			and qaa.ID = #{pd.aid}
+		</if>
+		<if test="pd.startTime != null and pd.startTime != ''">
+			and qaa.APPROVE_TIME &gt;= #{pd.startTime}
+		</if>
+		<if test="pd.endTime != null and pd.endTime != ''">
+			and qaa.APPROVE_TIME &lt;= date_add(#{pd.endTime}, interval 1 day)
+		</if>
+		order by qaa.APPROVE_TIME desc
+	</select>
+	
+	<!-- 添加牌照异常 -->
+	<insert id="insertQRCodeAbnormal" parameterType="pd">
+		insert into lp_qrcode_abnormal (ID,RELATION_ID,APPROVE_TIME,APPROVEUSER_ID,APPROVEUSER_NAME,ABNORMAL_CODE)
+			values (#{aid},#{pid},NOW(),#{uid},#{uname},#{code})
+	</insert>
+	
+	<!-- 修改牌照异常修复描述等信息 -->
+	<update id="updateQRCodeAbnormal" parameterType="pd">
+		update lp_qrcode_abnormal 
+		<set>
+			<if test="remark != null">REPAIR_REMARK = #{remark},</if>
+			REPAIR_TIME = NOW(),
+			<if test="uid != null">REPAIRUSER_ID = #{uid},</if>
+			<if test="uname != null">REPAIRUSER_NAME = #{uname}</if>
+		</set>
+		where id = #{aid}
+	</update>
+	
+	<!-- 修改牌照编码信息 -->
+	<update id="updateQRCodeRecord" parameterType="pd">
+		update lp_license_record 
+		<set>
+			<if test="licensecode != null">LICENSECODE = #{licensecode}</if>
+		</set>
+		where pripid = #{pripid}
+	</update>
+	
+	<!-- 添加牌照选择制作 -->
+	<insert id="insertQRCodeMake" parameterType="pd">
+		insert into lp_qrcode_make (ID,RELATION_ID,BATCHNUMBER,APPROVE_TIME,APPROVEUSER_ID,APPROVEUSER_NAME,AREACODE)
+			values (#{mid},#{pid},#{batchNumber},NOW(),#{uid},#{uname},#{areaCode})
+	</insert>
+	
+	<!-- 查询牌照选择制作 -->
+	<select id="queryQRCodeMakelistPage" parameterType="pd" resultType="pd">
+		select qs.*,qa.ENTNAME,qa.PRIPID,qa.APPLY_NUMBER,qp.LICENSECODE,qp.STATUS,lr.LICENSENUMBER from lp_qrcode_stateaudit qs 
+			left join lp_qrcode_print qp on qs.RELATION_ID = qp.ID
+			left join lp_qrcode_apply qa on qp.RELATION_ID = qa.ID
+			left join lp_license_record lr on qa.PRIPID = lr.PRIPID
+			where qp.STATUS = 1
+		<if test="pd.entname != null and pd.entname != ''">
+			and qa.ENTNAME LIKE CONCAT(CONCAT('%', #{pd.entname}),'%') 
+		</if>	
+		<if test="pd.startTime != null and pd.startTime != ''">
+			and qs.APPROVE_TIME &gt;= #{pd.startTime}
+		</if>
+		<if test="pd.endTime != null and pd.endTime != ''">
+			and qs.APPROVE_TIME &lt;= date_add(#{pd.endTime}, interval 1 day)
+		</if>
+		order by qs.APPROVE_TIME desc
+	</select>
+	
+	<!-- 查询牌照选择制作的批次 -->
+	<select id="queryQRCodeMakeBybarchNumber" resultType="String">
+		select max(BATCHNUMBER) from lp_qrcode_make;
+	</select>
+	
+	<!-- 查询批次记录 -->
+	<select id="queryBarchNumberlistPage" resultType="pd" parameterType="page">
+		select m.BATCHNUMBER,m.AREACODE,m.APPROVE_TIME,m.APPROVEUSER_NAME,
+			(select count(1) from lp_qrcode_make where BATCHNUMBER = m.BATCHNUMBER) NUM
+			from lp_qrcode_make m 
+			where 1 = 1
+		<if test="pd.barchNumber != null and pd.barchNumber != ''">
+			and concat(m.AREACODE,m.BATCHNUMBER) = #{pd.barchNumber}  
+		</if>
+		group by m.BATCHNUMBER
+		order by m.APPROVE_TIME desc
+	</select>
+	
+	<!-- 查询牌照入库 -->
+	<select id="queryQRCodeStoragelistPage" parameterType="pd" resultType="pd">
+		select qm.*,qa.ENTNAME,qp.NUMBER,qp.LICENSECODE,qp.STATUS,lr.LICENSENUMBER,concat(qm.AREACODE,qm.BATCHNUMBER) BATCHNO
+			from lp_qrcode_make qm 
+			left join lp_qrcode_print qp on qm.RELATION_ID = qp.ID
+			left join lp_qrcode_apply qa on qp.RELATION_ID = qa.ID
+			left join lp_license_record lr on qa.PRIPID = lr.PRIPID
+			where qp.STATUS = 3
+		<if test="pd.barchNumber != null and pd.barchNumber != ''">
+			and concat(qm.AREACODE,qm.BATCHNUMBER) = #{pd.barchNumber}  
+		</if>
+		<if test="pd.entname != null and pd.entname != ''">
+			and qa.ENTNAME LIKE CONCAT(CONCAT('%', #{pd.entname}),'%') 
+		</if>
+		<if test="pd.startTime != null and pd.startTime != ''">
+			and qm.APPROVE_TIME &gt;= #{pd.startTime}
+		</if>
+		<if test="pd.endTime != null and pd.endTime != ''">
+			and qm.APPROVE_TIME &lt;= date_add(#{pd.endTime}, interval 1 day)
+		</if>
+		order by qm.APPROVE_TIME desc
+	</select>
+	
+	<!-- 添加牌照入库 -->
+	<insert id="insertQRCodeStorage" parameterType="pd">
+		insert into lp_qrcode_storage (ID,RELATION_ID,STATUS,NUMBER,APPROVE_TIME,APPROVEUSER_ID,APPROVEUSER_NAME)
+			values (#{sid},#{pid},#{stStatus},#{number},NOW(),#{uid},#{uname})
+	</insert>
+	
+	<!-- 查询牌照领取通知 -->
+	<select id="queryQRCodeNoticelistPage" parameterType="pd" resultType="pd">
+		select qs.*,qa.ID AID,qa.PRIPID,qa.ENTNAME,qa.REGNO,qa.EMAIL,qa.TEL,qa.APPLY_NAME,qp.ID PID,qp.LICENSECODE,qp.STATUS QPSTATUS,lr.LICENSENUMBER,concat(qm.AREACODE,qm.BATCHNUMBER) BATCHNO,
+			(select count(1) from lp_qrcode_notice where RELATION_ID = qs.RELATION_ID) noticeCount
+			from lp_qrcode_storage qs 
+			left join lp_qrcode_print qp on qs.RELATION_ID = qp.ID
+			left join lp_qrcode_apply qa on qp.RELATION_ID = qa.ID
+			left join lp_qrcode_make qm on qm.RELATION_ID = qp.ID
+			left join lp_license_record lr on qa.PRIPID = lr.PRIPID
+			where (qp.STATUS = 4 or qp.STATUS = 6)
+		<if test="pd.entname != null and pd.entname != ''">
+			and qa.ENTNAME LIKE CONCAT(CONCAT('%', #{pd.entname}),'%') 
+		</if>
+		<if test="pd.barchNumber != null and pd.barchNumber != ''">
+			and concat(qm.AREACODE,qm.BATCHNUMBER) = #{pd.barchNumber}  
+		</if>
+		<if test="pd.startTime != null and pd.startTime != ''">
+			and qs.APPROVE_TIME &gt;= #{pd.startTime}
+		</if>
+		<if test="pd.endTime != null and pd.endTime != ''">
+			and qs.APPROVE_TIME &lt;= date_add(#{pd.endTime}, interval 1 day)
+		</if>
+		order by qs.APPROVE_TIME desc
+	</select>
+	
+	<!-- 添加牌照领取通知 -->
+	<insert id="insertQRCodeNotice" parameterType="pd">
+		insert into lp_qrcode_notice (ID,RELATION_ID,SEND_TIME,SENDUSER_ID,SENDUSER_NAME)
+			values (#{nid},#{pid},NOW(),#{uid},#{uname})
+	</insert>
+	
+	<!-- 查询牌照领取 只查询通知后的牌照信息-->
+ 	<!--<select id="queryQRCodeReceivelistPage" parameterType="pd" resultType="pd">
+		select qn.*,qa.ENTNAME,qa.REGNO,qa.EMAIL,qa.TEL,qp.LICENSECODE,qp.NUMBER,lr.LICENSENUMBER,concat(qm.AREACODE,qm.BATCHNUMBER) BATCHNO,max(qn.SEND_TIME) 
+			from lp_qrcode_notice qn
+			left join lp_qrcode_print qp on qn.RELATION_ID = qp.ID
+			left join lp_qrcode_apply qa on qp.RELATION_ID = qa.ID
+			left join lp_qrcode_make qm on qm.RELATION_ID = qp.ID
+			left join lp_license_record lr on qa.PRIPID = lr.PRIPID
+			where qp.STATUS = 6	
+		<if test="pd.entname != null and pd.entname != ''">
+			and qa.ENTNAME LIKE CONCAT(CONCAT('%', #{pd.entname}),'%') 
+		</if>	
+		<if test="pd.barchNumber != null and pd.barchNumber != ''">
+			and concat(qm.AREACODE,qm.BATCHNUMBER) = #{pd.barchNumber}  
+		</if>
+		<if test="pd.startTime != null and pd.startTime != ''">
+			and qn.SEND_TIME &gt;= #{pd.startTime}
+		</if>
+		<if test="pd.endTime != null and pd.endTime != ''">
+			and qn.SEND_TIME &lt;= date_add(#{pd.endTime}, interval 1 day)
+		</if>
+		group by qn.RELATION_ID
+		order by qn.SEND_TIME desc
+	</select> -->
+	
+	<!-- 添加牌照领取 -->
+	<select id="insertQRCodeReceive" parameterType="pd" resultType="pd">
+		insert into lp_qrcode_record (ID,RELATION_ID,RECEIVE_TIME,APPROVEUSER_ID,APPROVEUSER_NAME)
+			values (#{rid},#{pid},NOW(),#{uid},#{uname})
+	</select>
+	
+	<!-- 查询牌照领取记录 -->
+	<select id="queryQRCodeRecordlistPage" parameterType="pd" resultType="pd">
+		select qr.*,qa.ENTNAME,qa.EMAIL,qa.TEL,qp.LICENSECODE,qp.NUMBER,lr.LICENSENUMBER,concat(qm.AREACODE,qm.BATCHNUMBER) BATCHNO
+			from lp_qrcode_record qr
+			left join lp_qrcode_print qp on qr.RELATION_ID = qp.ID
+			left join lp_qrcode_apply qa on qp.RELATION_ID = qa.ID
+			left join lp_qrcode_make qm on qm.RELATION_ID = qp.ID
+			left join lp_license_record lr on qa.PRIPID = lr.PRIPID
+			where qp.STATUS = 7
+		<if test="pd.entname != null and pd.entname != ''">
+			and qa.ENTNAME LIKE CONCAT(CONCAT('%', #{pd.entname}),'%') 
+		</if>
+		<if test="pd.barchNumber != null and pd.barchNumber != ''">
+			and concat(qm.AREACODE,qm.BATCHNUMBER) = #{pd.barchNumber}  
+		</if>
+		<if test="pd.startTime != null and pd.startTime != ''">
+			and qr.RECEIVE_TIME &gt;= #{pd.startTime}
+		</if>
+		<if test="pd.endTime != null and pd.endTime != ''">
+			and qr.RECEIVE_TIME &lt;= date_add(#{pd.endTime}, interval 1 day)
+		</if>
+		order by qr.RECEIVE_TIME desc
+	</select>
+</mapper>

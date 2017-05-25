@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BusinessMapper">
+
+
+	
+
+	
+
+	
+	<!-- 查看我的历史查询列表 -->
+	<select id="queryHistoryInfolistPage" parameterType="page" resultType="pd" useCache="false">
+        SELECT * from(SELECT O.PRIPID,E.`NAME`,E.ENTNAME,E.ENTTYPE_CN,E.REGCAP,E.REGCAPCUR_CN,LOGTIME 
+          FROM SYS_LOG_OPERATION O,bl_enteradditioninfo E
+          where O.MEMBER_ID=#{pd.memberId}  AND E.PRIPID=O.PRIPID
+          and O.MODULENAME='九宫格首页' 
+          ORDER BY O.LOGTIME DESC)t GROUP by PRIPID ORDER BY LOGTIME DESC
+	</select>
+	
+	<!-- 查看我的历史查询列表 -->
+	<select id="queryHistoryInfo" parameterType="pd" resultType="pd" useCache="false">
+        SELECT * from(SELECT O.PRIPID,E.`NAME`,E.ENTNAME,E.ENTTYPE_CN,E.REGCAP,E.REGCAPCUR_CN,LOGTIME 
+          FROM SYS_LOG_OPERATION O,bl_enteradditioninfo E
+          where O.MEMBER_ID=#{memberId}  AND E.PRIPID=O.PRIPID
+          and O.MODULENAME='九宫格首页'ORDER BY O.LOGTIME DESC)t GROUP by PRIPID ORDER BY LOGTIME DESC
+	</select>
+	
+	<!-- 得到搜索历史 -->
+	<select id="querySearchHistoryInfolistPage" parameterType="page" resultType="pd" useCache="false">
+	   	<!-- SELECT LOGID,MEMBER_ID,KEYWORDS,LOGTIME,REMARK FROM SYS_LOG_KEYWORD t1 WHERE 1 = 1 
+		   	<if test="pd.memberId != null  and pd.memberId !='' ">
+			   	<![CDATA[
+			   		and not exists(select 1 from SYS_LOG_KEYWORD t2 where t1.KEYWORDS = t2.KEYWORDS
+	 					and t1.LOGTIME < t2.LOGTIME 
+	 					and MEMBER_ID = #{pd.memberId}) 
+					and t1.MEMBER_ID = #{pd.memberId}  
+				]]>
+			</if>
+	   	ORDER BY t1.LOGTIME DESC -->
+	   	SELECT T.LOGID,T.MEMBER_ID,T.KEYWORDS,T.LOGTYPE,T.LOGTIME,REMARK
+			FROM SYS_LOG_KEYWORD T WHERE 1 = 1
+		<if test="pd.memberId != null  and pd.memberId !='' ">
+			and T.MEMBER_ID = #{pd.memberId}
+		</if>
+		<if test="pd.logType != null  and pd.logType !='' ">
+			and T.LOGTYPE = #{pd.logType} 
+		</if>
+		 GROUP BY T.KEYWORDS ORDER BY COUNT(T.KEYWORDS) DESC
+	</select>
+	
+	<!-- 得到搜索历史 -->
+	<select id="querySearchHistoryInfo" parameterType="pd" resultType="pd" useCache="false">
+		SELECT T.LOGID,T.MEMBER_ID,T.KEYWORDS,T.LOGTYPE,T.LOGTIME,REMARK
+			FROM SYS_LOG_KEYWORD T WHERE 1 = 1
+		<if test="memberId != null  and memberId !='' ">
+			and T.MEMBER_ID = #{memberId}
+		</if>
+		<if test="logType != null  and logType !='' ">
+			and T.LOGTYPE = #{logType}
+		</if>
+		 GROUP BY T.KEYWORDS ORDER BY COUNT(T.KEYWORDS) DESC
+	</select>
+	
+	<!-- 点击查询热点分析详情 -->
+	<select id="queryHotspotAnalysislistPage" parameterType="page" resultType="pd">
+	    SELECT K.KEYWORDS ,K.LOGTIME ,K.REMARK ,
+		(SELECT M.USERNAME FROM BL_MEMBER M WHERE M.ID = K.FK_OPERATIONLOG_MEMBERID) USERNAME 
+		FROM SYS_KEYWORDLOG K 
+		WHERE 1 = 1 
+		<if test="pd.startTime != null and pd.startTime != '' ">
+			<![CDATA[ and DATE_FORMAT(K.LogTime,'%Y-%m-%d %T') >= DATE_FORMAT(#{pd.startTime},'%Y-%m-%d %T') ]]>
+		</if>
+		<if test="pd.endTime != null and pd.endTime != '' ">
+			<![CDATA[ and DATE_FORMAT(K.LogTime,'%Y-%m-%d %T') <= DATE_FORMAT(#{pd.endTime},'%Y-%m-%d %T') ]]>
+		</if>
+		<if test="pd.memberId != null and pd.memberId != '' ">
+		    and K.FK_OPERATIONLOG_MEMBERID=#{pd.memberId}
+		</if>
+		<if test="pd.keywords != null and pd.keywords != '' ">
+		    and K.KEYWORDS = #{pd.keywords}
+		</if>
+		GROUP BY K.KEYWORDS ORDER BY COUNT(K.KEYWORDS) DESC
+	</select>
+	
+	<!-- 保存用户反馈 -->
+	<insert id="saveOpinion" parameterType="pd">
+          INSERT INTO BL_OPINION(ID,MEMBERID,THEME,EMAIL,DESCRIPTION,CREATETIME)
+          VALUEs(#{id},#{memberId},#{theme},#{email},#{description},now())
+	</insert>
+</mapper>

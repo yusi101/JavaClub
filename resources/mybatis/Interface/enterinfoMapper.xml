@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="enterinfoMapper">
+
+	<select id="queryEnterinfo" parameterType="pd" resultType="pd">
+		SELECT 
+		t.EC_NAME AS NAME,
+		COUNT(1) as COUNT FROM 
+		ZR_SYS_CODE t,
+		bl_enteradditioninfo e 
+		WHERE
+		t.EC_CODE = 'CA05'
+		AND t.EC_VALUE = e.INDUSTRYPHY
+		<if test="type == '0' ">
+		   	AND e.ENTTYPE != '9500'
+		</if>
+		<if test="type == '1' ">
+			AND e.ENTTYPE == '9500'
+		</if>
+		
+		<if test="startTime != null and startTime != '' ">
+		    <![CDATA[ AND DATE_FORMAT(e.ESTDATE,'%Y-%m-%d %T') >= DATE_FORMAT(#{startTime},'%Y-%m-%d %T') ]]>
+		</if>
+		<if test="endTime != null and endTime != '' ">
+		    <![CDATA[ AND DATE_FORMAT(e.ESTDATE,'%Y-%m-%d %T') <= DATE_FORMAT(#{endTime},'%Y-%m-%d %T') ]]>
+		</if>
+		GROUP BY
+		t.EC_NAME
+	</select>
+	
+</mapper>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="KnowledgeMapper">
+
+	<!-- 查询全部知识库数据 -->
+	<select id="queryKnowlistPage" parameterType="page" resultType="pd">
+		SELECT s.ID,s.TITLE,s.CONTENT,u.NAME,DATE_FORMAT(s.CREATETIME,'%Y-%m-%d %H:%m:%s') AS TIME,ORDERBY from sys_knowledgebase s
+		LEFT JOIN sys_user u ON s.CREATEUSER_ID = u.USER_ID
+		 ORDER BY s.ORDERBY
+	</select>
+	
+	<!-- 查询知识 -->
+	<select id="queryKnowPage" parameterType="pd" resultType="pd">
+		SELECT s.ID,s.TITLE,s.CONTENT,s.CREATEUSER_ID,u.NAME,DATE_FORMAT(s.CREATETIME,'%Y-%m-%d %H:%m:%s') AS TIME,ORDERBY from sys_knowledgebase s
+		LEFT JOIN sys_user u ON s.CREATEUSER_ID = u.USER_ID
+		WHERE ID = #{ID}
+		
+	</select>
+	
+	<!-- 新增知识 -->
+	<insert id="insertKnow" parameterType="pd">
+		INSERT INTO sys_knowledgebase (ID,TITLE,CONTENT,CREATEUSER_ID,CREATETIME,ORDERBY)
+			VALUES(#{ID},#{TITLE},#{CONTENT},#{CREATEUSER_ID},NOW(),#{ORDERBY})
+	</insert>
+	
+	
+	<!-- 修改知识 -->
+	<update id="updateKnow" parameterType="pd">
+		UPDATE sys_knowledgebase SET
+				TITLE = #{TITLE},
+				CONTENT = #{CONTENT},
+				ORDERBY = #{ORDERBY}
+		 WHERE ID = #{ID}
+	</update>
+	
+	<!-- 删除知识 -->
+	<delete id="deleteKnow" parameterType="pd">
+		DELETE FROM sys_knowledgebase WHERE ID = #{ID}
+	</delete>
+	
+	<!-- 判断已存在的数据 -->
+	<select id="queryKnow" parameterType="page" resultType="pd">
+		SELECT s.TITLE,s.CONTENT,s.ORDERBY from sys_knowledgebase s WHERE s.TITLE = #{TITLE} and s.CONTENT = #{CONTENT}
+	</select>
+	
+	
+
+
+
+
+
+
+</mapper>

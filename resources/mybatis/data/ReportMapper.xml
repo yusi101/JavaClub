@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ReportMapper">
+	
+	
+	<!-- 插入征信报告发送历史 -->
+	<insert id="insertReport" parameterType="pd">
+		INSERT INTO bl_report_history (ID,CREATEUSER_ID,ENTTYPE,ENTNAME,PRIPID,EMAIL,TEL,IP,CREATETIME,SELECTS)
+			VALUES(#{uuid},#{memberId},#{priptype},#{entname},#{pripid},#{email},#{tel},#{ip},NOW(),#{select})
+	</insert>
+	
+	<!-- 查询征信报告发送历史 -->
+	<select id="queryReportCount" parameterType="page" resultType="pd">	
+		SELECT * FROM bl_report_history r order by r.CREATETIME desc
+	</select>
+	
+	<!-- 根据ID查询用户账号 -->
+	<select id="queryReportCountUser" parameterType="pd" resultType="pd">	
+		SELECT USERNAME FROM bl_member WHERE ID = #{CREATEUSER_ID} 
+	</select>
+	
+	
+		<!-- 删除征信报告发送历史 -->
+	<delete id="deleteReport" parameterType="pd">
+		DELETE FROM bl_report_history WHERE ID = #{ID} 
+	</delete>
+		<!-- 查询单个征信报告数据 -->
+	<select id="queryReportById" parameterType="pd" resultType="pd">
+		SELECT ID,CREATEUSER_ID,ENTTYPE,ENTNAME,PRIPID,EMAIL,TEL,IP,CREATETIME,SELECTS
+			FROM bl_report_history WHERE ID = #{ID}
+	</select>
+	
+	<!-- 根据企业查询记录 -->
+	<select id="queryReportName" parameterType="page" resultType="pd">	
+		SELECT * FROM bl_report_history r WHERE r.ENTNAME =#{pd.NAME} order by r.CREATETIME desc
+	</select>
+	
+</mapper>

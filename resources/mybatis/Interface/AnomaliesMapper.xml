@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AnomaliesMapper">
+
+    <!-- 经营异常信息 分页 	 -->
+	<select id="queryAnomaliesInfolistPage" parameterType="page" resultType="pd">
+          <if test="pd.priptype =='9500' ">
+             SELECT BUSEXCLIST, PRIPID, ENTNAME, UNISCID, REGNO, LEREP, CERTYPE, CERNO, EXCPSTARES SPECAUSE, EXCPSTARES_CN SPECAUSE_CN,
+              	COGDATE ABNTIME, DECORG, DECORG_CN, ISRECOVERY ISMOVE,
+ 				NORREA REMEXCPRES, NORREA_CN REMEXCPRES_CN, NORDATE REMDATE, NORDECORG REDECORG, NORDECORG_CN REDECORG_CN 
+ 				FROM AO_PB_OPANOMALY
+ 		  </if>
+ 		  <if test="pd.priptype != '9500'">
+ 		     SELECT BUSEXCLIST, PRIPID, ENTNAME, UNISCID, REGNO, LEREP, CERTYPE, CERNO, SPECAUSE, SPECAUSE_CN, ABNTIME, DECORG, DECORG_CN,
+ 		        ISMOVE,REMEXCPRES, REMEXCPRES_CN, REMDATE, REDECORG, REDECORG_CN
+ 		    	 <if test="pd.priptype == '9100'"> 
+ 		    	   	FROM AO_SFC_OPADETAIL
+ 		    	 </if>
+ 		     	 <if test="pd.priptype == '9200'"> 
+ 		      		 FROM AO_SFCBR_OPADETAIL
+ 		    	 </if>
+ 		    	 <if test="pd.priptype != '9100' and pd.priptype != '9200'">
+ 		       		 FROM AO_OPA_DETAIL
+ 		    	 </if>
+ 		  </if>
+ 		  WHERE 1=1
+ 		  <if test="pd.pripid != null and pd.pripid != ''">
+ 		   AND  PRIPID=#{pd.pripid}
+     	  </if>
+     	  <if test="pd.entname != null and pd.entname != ''">
+ 		   AND  ENTNAME=#{pd.entname}
+     	  </if>
+     	  <if test="pd.busexcList != null and pd.busexcList != ''">
+ 		   AND  BUSEXCLIST=#{pd.busexcList}
+     	  </if>
+     </select>
+	<!-- 经营异常信息  不分页 	 -->
+	<select id="queryAnomaliesInfo" parameterType="pd" resultType="pd">
+          <if test="priptype =='9500' ">
+             SELECT BUSEXCLIST, PRIPID, ENTNAME, UNISCID, REGNO, LEREP, CERTYPE, CERNO, EXCPSTARES SPECAUSE, EXCPSTARES_CN SPECAUSE_CN,
+              	COGDATE ABNTIME, DECORG, DECORG_CN, ISRECOVERY ISMOVE,
+ 				NORREA REMEXCPRES, NORREA_CN REMEXCPRES_CN, NORDATE REMDATE, NORDECORG REDECORG, NORDECORG_CN REDECORG_CN 
+ 				FROM AO_PB_OPANOMALY
+ 		  </if>
+ 		  <if test="priptype != '9500'">
+ 		    SELECT BUSEXCLIST, PRIPID, ENTNAME, UNISCID, REGNO, LEREP, CERTYPE, CERNO, SPECAUSE, SPECAUSE_CN, ABNTIME, DECORG, DECORG_CN,
+ 		     ISMOVE,REMEXCPRES, REMEXCPRES_CN, REMDATE, REDECORG, REDECORG_CN
+ 		    	 <if test="priptype == '9100'"> 
+ 		    	   	FROM AO_SFC_OPADETAIL
+ 		    	 </if>
+ 		     	 <if test="priptype == '9200'"> 
+ 		      		 FROM AO_SFCBR_OPADETAIL
+ 		    	 </if>
+ 		    	 <if test="priptype != '9100' and priptype != '9200'">
+ 		       		 FROM AO_OPA_DETAIL
+ 		    	 </if>
+ 		  </if>
+ 		  WHERE 1=1
+ 		  <if test="pripid != null and pripid != ''">
+ 		   AND  PRIPID=#{pripid}
+     	  </if>
+     	  <if test="entname != null and entname != ''">
+ 		   AND  ENTNAME=#{entname}
+     	  </if>
+     	  <if test="busexcList != null and busexcList != ''">
+ 		   AND  BUSEXCLIST=#{busexcList}
+     	  </if>
+     </select>
+    
+</mapper>

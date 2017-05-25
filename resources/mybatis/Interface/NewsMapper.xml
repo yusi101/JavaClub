@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="NewsMapper">
+
+	<!-- 查询最新新闻 -->
+	<select id="queryNewInformationlistPage" parameterType="page" resultType="pd" useCache="false">
+	  SELECT E.CONTENT_ID ID,E.TITLE,E.AUTHOR,E.ORIGIN,E.DESCRIPTION,DATE_FORMAT(E.RELEASE_DATE,'%Y-%c-%d %H:%i') AS RELEASE_DATE,E.TITLE_IMG,E.CONTENT_IMG,C.MODEL_ID
+	   <if test="pd.contentId != null and pd.contentId != ''">
+			,T.TXT 
+	   </if>
+      FROM  JC_CONTENT C,JC_CONTENT_EXT E,JC_CONTENT_TXT T
+      WHERE C.STATUS=2 AND C.CONTENT_ID=E.CONTENT_ID AND  T.CONTENT_ID=E.CONTENT_ID AND C.CHANNEL_ID='70' AND C.STATUS = 2
+       <if test="pd.entname != null and pd.entname != ''">
+			AND T.TXT LIKE CONCAT(CONCAT('%',#{pd.entname}),'%')
+	   </if>
+	   <if test="pd.contentId != null and pd.contentId != ''">
+			AND E.CONTENT_ID=#{pd.contentId}
+	   </if>
+       ORDER BY E.RELEASE_DATE DESC
+	</select>
+    
+    <!-- 查询最新新闻 -->
+	<select id="queryNewInformation" parameterType="pd" resultType="pd" useCache="false">
+	  SELECT E.CONTENT_ID ID,E.TITLE,E.AUTHOR,E.ORIGIN,E.DESCRIPTION,DATE_FORMAT(E.RELEASE_DATE,'%Y-%c-%d %H:%i') AS RELEASE_DATE,E.TITLE_IMG,E.CONTENT_IMG,C.MODEL_ID
+	   <if test="contentId != null and contentId != ''">
+			,T.TXT 
+	   </if>
+      FROM  JC_CONTENT C,JC_CONTENT_EXT E,JC_CONTENT_TXT T
+      WHERE C.STATUS=2 AND C.CONTENT_ID=E.CONTENT_ID AND  T.CONTENT_ID=E.CONTENT_ID AND C.CHANNEL_ID='70' AND C.STATUS = 2
+       <if test="entname != null and entname != ''">
+			AND T.TXT LIKE CONCAT(CONCAT('%',#{entname}),'%')
+	   </if>
+	   <if test="contentId != null and contentId != ''">
+			AND E.CONTENT_ID=#{contentId}
+	   </if>
+       ORDER BY E.RELEASE_DATE DESC
+	</select>
+	
+	
+    <!-- 查询企业新闻 -->
+	<select id="queryEntNewsInfolistPage" parameterType="page" resultType="pd" useCache="false">
+	   SELECT E.ID,E.TITLE,E.ORIGIN,E.DESCRIPTION,E.RELEASE_DATE,E.FETCH_URL,
+            E.FETCH_TIME,E.VISIT_NUM, E.ENTNAME,E.PRIPID,E.FETCH_WEBSITE
+	   <if test="pd.newId != null and pd.newId != ''">
+			,E.CONTENT TXT
+	   </if>
+        FROM ZR_LC_ENTNEWS E WHERE 1=1
+	   <if test="pd.pripid != null and pd.pripid != ''">
+			AND E.PRIPID=#{pd.pripid}
+	   </if>
+	   <if test="pd.newId != null and pd.newId != ''">
+			AND E.ID=#{pd.newId}
+	   </if>
+	    ORDER BY E.RELEASE_DATE DESC
+	</select>
+	
+	<!-- 查询企业新闻 -->
+	<select id="queryEntNewsInfo" parameterType="pd" resultType="pd" useCache="false">
+	   SELECT E.ID,E.TITLE,E.ORIGIN,E.DESCRIPTION,E.RELEASE_DATE,E.FETCH_URL,
+            E.FETCH_TIME,E.VISIT_NUM, E.ENTNAME,E.PRIPID,E.FETCH_WEBSITE
+	   <if test="newId != null and newId != ''">
+			,E.CONTENT TXT
+	   </if>
+        FROM ZR_LC_ENTNEWS E WHERE 1=1
+	   <if test="pripid != null and pripid != ''">
+			AND E.PRIPID=#{pripid}
+	   </if>
+	   <if test="newId != null and newId != ''">
+			AND E.ID=#{newId}
+	   </if>
+	    ORDER BY E.RELEASE_DATE DESC
+	</select>
+</mapper>

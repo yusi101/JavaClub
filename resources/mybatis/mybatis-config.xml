@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD SQL Map Config 3.0//EN"  
+	"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- 注意configuration中各个属性配置的顺序应为：properties,settings,typeAliases,typeHandlers,
+	objectFactory,objectWrapperFactory,reflectorFactory,plugins,environments,databaseIdProvider,mappers)-->
+	<settings> 
+        <setting name="cacheEnabled" value="true" /><!-- 全局映射器启用缓存 -->   
+        <setting name="useGeneratedKeys" value="true" /> 
+        <setting name="defaultExecutorType" value="REUSE" />
+        <setting name="callSettersOnNulls" value="true"/><!-- 如果参数为空，map里面的值依然显示 -->
+        <setting name="jdbcTypeForNull" value="NULL"/>  
+    </settings>
+
+	<typeAliases>
+		<!-- 数据对象 
+		<typeAlias type="实体对象" alias="别名"/>
+		-->
+		<typeAlias type="com.JavaClub.entity.system.User" alias="User"/>
+		<typeAlias type="com.JavaClub.entity.system.Role" alias="Role"/>
+		<typeAlias type="com.JavaClub.entity.system.Menu" alias="Menu"/>
+		<typeAlias type="com.JavaClub.util.PageData" alias="pd"/>
+		<!-- 分页 -->
+		<typeAlias type="com.JavaClub.entity.Page" alias="Page"/>
+	</typeAliases>
+	<typeHandlers>
+		<!-- jdbcType 配置数据库基本数据类型，例如varchar, 如果配上jdbcType, 那么指定的typeHandler就只作用于指定的类型  -->
+		<typeHandler jdbcType="CLOB" handler="com.JavaClub.handler.ClobTypeHandler"/>
+	</typeHandlers>
+	<plugins>
+		<plugin interceptor="com.JavaClub.plugin.PagePlugin">
+			<property name="dialect" value="mysql"/><!-- mysql    oracle  -->
+			<property name="pageSqlId" value=".*listPage.*"/>
+		</plugin>
+	</plugins>
+	
+</configuration>

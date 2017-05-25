@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="VisitorMapper">
+	
+	<!-- 添加访客记录-->
+	<insert id="createVisitor" parameterType="pd">
+		INSERT INTO bl_visitor(ID,VISITORNAME,ENTNAME,TEL,EMAIL,QQ,RECEIVERNAME,RECEIVERTIME,CREATEUSER_ID,CREATEUSER_NAME,CREATETIME) 
+		VALUES (#{ID},#{visitorName},#{entName},#{tel},#{email},#{QQ},#{receiverName},#{receivrTime},#{createUser_ID},#{createUser_Name},NOW())
+	</insert>
+	
+	<!-- 查询访客记录 -->
+	<select id="queryVisitorlistPage"  parameterType="page" resultType="pd">
+		SELECT v.ID,v.VISITORNAME,v.ENTNAME,v.TEL,v.EMAIL,v.QQ,v.RECEIVERNAME,v.RECEIVERTIME,v.CREATEUSER_ID,v.CREATEUSER_NAME,v.CREATETIME
+		FROM bl_visitor v WHERE 1=1 
+		<if test="pd.ID != null and pd.ID !=''">
+			AND v.ID = #{pd.ID}
+		</if>
+		<if test="pd.entName != null and pd.entName !=''">
+			AND v.ENTNAME LIKE CONCAT(CONCAT('%',#{pd.entName}),'%')
+		</if>
+		GROUP BY v.CREATETIME DESC
+	</select>
+	
+	<!-- 删除访客记录-->
+	<delete id="deleteVisitor" parameterType="pd">
+		DELETE from bl_visitor WHERE ID = #{ID}
+	</delete>
+	
+	<!-- 修改访客记录 -->
+	<update id="updateVisitor" parameterType="pd">
+		UPDATE bl_visitor SET VISITORNAME=#{visitorName},ENTNAME=#{entName},TEL=#{tel},EMAIL=#{email},QQ=#{QQ},RECEIVERNAME=#{receiverName},RECEIVERTIME=#{receivrTime} WHERE ID=#{ID}
+	</update>
+</mapper>

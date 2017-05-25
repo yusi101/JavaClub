@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PkgInfoMapper">
+
+	<!-- 查询套餐信息 分页 -->
+	<select id="queryPkgInfolistPage" parameterType="page" resultType="pd" useCache="false">
+	   SELECT ID,PKG_NAME , PKG_USERTIME , PKG_PRICE
+	   FROM ZR_ZX_CHARGEPKG
+	   WHERE STATUS != 0
+	   ORDER BY CREATE_TIME
+	</select>
+	
+	
+	<!-- 查询套餐信息 不分页 -->
+    <select id="queryPkgInfo" parameterType="pd" resultType="pd">
+	   SELECT ID,PKG_NAME , PKG_USERTIME , PKG_PRICE
+	   FROM ZR_ZX_CHARGEPKG
+	   WHERE STATUS != 0
+	   ORDER BY CREATE_TIME
+    </select>
+    
+    <!-- 插入套餐信息 -->
+	<insert id="savePackage" parameterType="pd">
+       INSERT INTO ZR_ZX_CHARGEPKG(ID,STATUS , CREATE_TIME,PKG_PRICE, PKG_USERTIME, PKG_NAME)
+       VALUES(#{pkgId},#{status},NOW(),#{pkg_price},#{pkg_usertime},#{pkg_name})
+	</insert>
+	
+	<!-- 插入套餐内功能明细 -->
+	<insert id="savePkgWay" parameterType="pd">
+       INSERT INTO ZR_ZX_CHARGEWAY(ID,STATUS,WAY,REMARK,USER_TIME,CHARGEPKG_ID)
+       VALUES(#{wayId},#{status},#{way},#{remark},#{user_time},#{pkgId})
+	</insert>
+	
+	
+	<!-- 查询套餐明细-->
+    <select id="queryPkgInfoById" parameterType="pd" resultType="pd">
+	   SELECT WAY,USER_TIME,REMARK 
+	   FROM ZR_ZX_CHARGEWAY
+	   WHERE CHARGEPKG_ID = #{id}
+	   ORDER BY WAY 
+    </select>
+    
+    <!-- 修改套餐 -->
+	<update id="updatePackage" parameterType="pd">
+		UPDATE ZR_ZX_CHARGEPKG SET
+		STATUS=#{status}
+		WHERE ID=#{id}
+	 </update>
+</mapper>

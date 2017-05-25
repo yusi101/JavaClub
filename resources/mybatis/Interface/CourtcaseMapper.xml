@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CourtcaseMapper">
+
+	<resultMap type="Map" id="JusticeInfo"></resultMap>
+	
+	<!-- 获取失信被执行人信息 -->
+	<select id="queryCourtcaseInfolistPage" parameterType="page"
+		resultType="pd">
+		SELECT
+		Z.COURTCASEID,
+		Z.INAME,
+		Z.CASE_CODE,
+		Z.CARDNUM,
+		Z.REGNORE,
+		Z.BUESINESSENTITY,
+		Z.COURT_NAME,
+		Z.AREA_NAME,
+		Z.GIST_CID,
+		DATE_FORMAT(z.REG_DATE,'%Y年%m月%d日') AS REG_DATE,
+		Z.GIST_UNIT,
+		Z.DUTY,
+		Z.PERFORMANCE,
+		Z.DISREPUT_TYPE_NAME,
+		DATE_FORMAT(z.PUBLISH_DATE,'%Y年%m月%d日') AS PUBLISH_DATE,
+		Z.CASE_CONTENT,
+		Z.CARDTYPE
+		FROM
+		ZR_COURTCASEINFO Z
+		WHERE 1 = 1
+		<if test="pd.iname != null and pd.iname != ''">
+			AND (Z.INAME  LIKE	CONCAT(CONCAT('%',#{pd.iname}),'%') or Z.BUESINESSENTITY  LIKE	CONCAT(CONCAT('%',#{pd.iname}),'%') )
+		</if>
+		<if test="pd.cardtype != null and pd.cardtype != ''">
+			AND z.CARDTYPE = #{pd.cardType}
+		</if>
+		<if test="pd.courtcaseId != null and pd.courtcaseId != ''">
+			AND  z.courtcaseId=#{pd.courtcaseId}
+		</if>
+		<if test="pd.pripid != null and pd.pripid != ''">
+			AND  z.PRIPID=#{pd.pripid}
+		</if>
+		<if test="pd.WORKNAME != null and pd.WORKNAME != ''">
+			AND z.INAME LIKE CONCAT('%',#{pd.WORKNAME},'%')
+		</if>
+		<if test="pd.day != null and pd.day != ''">
+			<![CDATA[ and DATE_FORMAT(z.PUBLISH_DATE,'%Y-%m-%d') = DATE_FORMAT(#{pd.day},'%Y-%m-%d') ]]>
+		</if>
+		<if test="pd.month != null and pd.month != ''">
+			<![CDATA[ and DATE_FORMAT(z.PUBLISH_DATE,'%Y-%m') = DATE_FORMAT(#{pd.month},'%Y-%m') ]]>
+		</if>
+		<if test="pd.year != null and pd.year != ''">
+			<![CDATA[ and DATE_FORMAT(z.PUBLISH_DATE,'%Y') = DATE_FORMAT(#{pd.year},'%Y') ]]>
+		</if>
+		<if test="pd.week != null and pd.week != ''">
+			<![CDATA[ and DATE_FORMAT(z.PUBLISH_DATE,'%Y-%m-%d') <= DATE_FORMAT(#{pd.week},'%Y-%m-%d') ]]>
+		</if>
+		<if test="pd.endweek != null and pd.endweek != ''">
+			<![CDATA[ and DATE_FORMAT(z.PUBLISH_DATE,'%Y-%m-%d') >= DATE_FORMAT(#{pd.endweek},'%Y-%m-%d') ]]>
+		</if>
+		ORDER BY PUBLISH_DATE DESC
+	</select>
+
+
+	<!-- 获取失信被执行人信息 -->
+	<select id="queryCourtcaseInfo" parameterType="pd" resultType="pd">
+		SELECT
+		Z.COURTCASEID,
+		Z.INAME,
+		Z.CASE_CODE,
+		Z.CARDNUM,
+		Z.REGNORE,
+		Z.BUESINESSENTITY,
+		Z.COURT_NAME,
+		Z.AREA_NAME,
+		Z.GIST_CID,
+		DATE_FORMAT(z.REG_DATE,'%Y年%m月%d日') AS REG_DATE,
+		Z.GIST_UNIT,
+		Z.DUTY,
+		Z.PERFORMANCE,
+		Z.DISREPUT_TYPE_NAME,
+		DATE_FORMAT(z.PUBLISH_DATE,'%Y年%m月%d日') AS PUBLISH_DATE,
+		Z.CASE_CONTENT,
+		Z.CARDTYPE
+		FROM
+		ZR_COURTCASEINFO Z
+		WHERE 1 = 1
+		<if test="iname != null and iname != ''">
+			AND (Z.INAME  LIKE	CONCAT(CONCAT('%',#{iname}),'%') OR Z.BUESINESSENTITY  LIKE	CONCAT(CONCAT('%',#{iname}),'%'))
+		</if>
+		<if test="cardtype != null and cardtype != ''">
+			AND Z.CARDTYPE = #{cardtype}
+		</if>
+		<if  test="courtcaseId != null and courtcaseId != ''">
+			AND Z.COURTCASEID=#{courtcaseId}
+		</if>
+		<if test="pripid != null and pripid != ''">
+			AND  z.PRIPID=#{pripid}
+		</if>
+		ORDER BY PUBLISH_DATE DESC
+	</select>
+	
+	
+	<select id="queryJusticeInfo" resultMap="JusticeInfo,JusticeInfo,JusticeInfo,JusticeInfo" useCache="false"  statementType="CALLABLE" parameterType="pd">
+		CALL SP_QueryJusticeInfo(#{pripid})
+	</select>
+	<select id="queryJusticeCount" useCache="false" statementType="CALLABLE" parameterType="pd" resultType="pd">
+    	CALL SP_Get_FourCount(#{pripid})
+    </select>
+</mapper>

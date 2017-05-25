@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="InvestmentMapper">
+	
+	<!-- 返回结果集Map -->
+	<resultMap type="Map" id="perhapsRelation"></resultMap>
+	<!-- 企业对外投资 -->
+	<select id="queryPerhapsRelation" resultMap="perhapsRelation,perhapsRelation,perhapsRelation,perhapsRelation,perhapsRelation,perhapsRelation,perhapsRelation,perhapsRelation,perhapsRelation,perhapsRelation,perhapsRelation,perhapsRelation" useCache="false" 
+		statementType="CALLABLE" parameterType="pd">
+		CALL SP_GET_PERHAPSRELATION(#{pripid})
+	</select>	
+
+</mapper>
